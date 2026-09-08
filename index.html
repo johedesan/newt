@@ -3,9 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Newt — Newton Manuscript Correction Interface v1.22</title>
+    <title>Newt — Newton Manuscript Correction Interface v1.24</title>
 
-    <!-- Newt v1.22 — see CHANGELOG.md -->
+    <!-- Newt v1.24 — see CHANGELOG.md -->
+
+    <!-- Cache-control hints for GitHub Pages, which doesn't allow setting real
+         HTTP cache headers. Meta tags are honoured inconsistently across
+         browsers/situations (not a full substitute for server-side control),
+         but help reduce stale-cache issues on reload. -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
 
     <!-- KaTeX for math rendering -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
@@ -6412,7 +6420,7 @@ function _viewerShowIIIFCanvas() {
     var label = _viewerCanvasList[_viewerCanvasIdx];
     var svcUrl = _viewerCanvasMap[label];
     if (!svcUrl) return;
-    var src = svcUrl + '/full/!1000,1000/0/default.jpg';
+    var src = svcUrl + '/full/full/0/default.jpg';
     var lbl = label + '  (' + (_viewerCanvasIdx + 1) + ' / ' + _viewerCanvasList.length + ')';
     _viewerShowSrc(src, lbl);
     try { localStorage.setItem(_vPosKey(), String(_viewerCanvasIdx)); } catch(e) {}
@@ -7502,7 +7510,7 @@ function exportProjectMD() {
 
 function exportProjectConfig() {
     var cfg = getActiveProject();
-    var out = { _note: 'Newt project config', _version: 'newt_v1_22',
+    var out = { _note: 'Newt project config', _version: 'newt_v1_24',
         id: cfg.id, name: cfg.name, shortName: cfg.shortName, colour: cfg.colour,
         shelfmark: cfg.shelfmark, repository: cfg.repository, language: cfg.language,
         dateRange: cfg.dateRange, iiifUrl: cfg.iiifUrl,
@@ -7513,7 +7521,7 @@ function exportProjectConfig() {
 }
 
 function _buildFullBackupObject() {
-    var backup = { _note: 'Newt full backup', _version: 'newt_v1_22',
+    var backup = { _note: 'Newt full backup', _version: 'newt_v1_24',
         exported: new Date().toISOString(), data: {} };
     for (var i = 0; i < localStorage.length; i++) {
         var k = localStorage.key(i);
@@ -7582,9 +7590,11 @@ function _driveUpdateUI() {
     if (changeBtn) changeBtn.style.display = choiceMade ? '' : 'none';
 }
 
+var _driveSilentAttempt = false; // true only while a background (non-interactive) reconnect is in flight
+
 function _driveInitClient(callback) {
     if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
-        showStatus('Google sign-in library did not load — check your internet connection and reload.', 'error');
+        if (!_driveSilentAttempt) showStatus('Google sign-in library did not load — check your internet connection and reload.', 'error');
         return;
     }
     if (!_driveTokenClient) {
@@ -7592,6 +7602,7 @@ function _driveInitClient(callback) {
             client_id: DRIVE_CLIENT_ID,
             scope: DRIVE_SCOPE,
             callback: function(resp) {
+                _driveSilentAttempt = false;
                 if (resp && resp.access_token) {
                     _driveAccessToken = resp.access_token;
                     localStorage.setItem('newt_drive_was_connected', '1');
@@ -7602,7 +7613,13 @@ function _driveInitClient(callback) {
                 }
             },
             error_callback: function() {
-                showStatus('Google Drive connection was cancelled or failed.', 'error');
+                // Silent background reconnect attempts fail quietly and often -
+                // that's expected, not an error worth alarming the person about.
+                // Only show the banner for an explicit Connect-button click.
+                if (!_driveSilentAttempt) {
+                    showStatus('Google Drive connection was cancelled or failed.', 'error');
+                }
+                _driveSilentAttempt = false;
                 if (callback) callback(false);
             }
         });
@@ -7622,6 +7639,7 @@ function driveConnect() {
         showStatus('Disconnected from Google Drive', 'success');
         return;
     }
+    _driveSilentAttempt = false;
     _driveInitClient(function() {});
     _driveTokenClient.requestAccessToken({ prompt: 'consent' });
 }
@@ -7637,6 +7655,7 @@ function _driveTrySilentReconnect() {
         setTimeout(_driveTrySilentReconnect, 500);
         return;
     }
+    _driveSilentAttempt = true;
     _driveInitClient(function() {});
     _driveTokenClient.requestAccessToken({ prompt: '' });
 }
