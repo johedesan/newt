@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>[DEV] Newt — Newton Manuscript Correction Interface v1.27-dev8</title>
+    <title>[DEV] Newt — Newton Manuscript Correction Interface v1.27-dev9</title>
 
-    <!-- Newt v1.27-dev8 — see CHANGELOG.md -->
+    <!-- Newt v1.27-dev9 — see CHANGELOG.md -->
 
     <!-- Cache-control hints for GitHub Pages, which doesn't allow setting real
          HTTP cache headers. Meta tags are honoured inconsistently across
@@ -1246,6 +1246,29 @@
         /* v1.27 batch A */
         .mu-bold   { font-weight: 800; }
         .mu-struct { border-color: #607D8B; color: #37474F; font-weight: 600; }
+        /* v1.27 batch D — tier, timer, page breaks */
+        .tier-select { font-size: 11px; padding: 3px 4px; border: 1px solid #ccc; border-radius: 4px;
+                       background: #fff; color: #555; cursor: pointer; font-family: inherit; }
+        .tier-select.t1 { background: #2196F3; border-color: #1976D2; color: #fff; }
+        .tier-select.t2 { background: #4CAF50; border-color: #388E3C; color: #fff; }
+        .tier-select.t3 { background: #FFEB3B; border-color: #FBC02D; color: #333; }
+        .tier-select.t4 { background: #FF9800; border-color: #F57C00; color: #fff; }
+        .tier-select.t5 { background: #F44336; border-color: #D32F2F; color: #fff; }
+        .tier-select option { background: #fff; color: #333; }
+        .tier-select option[value="1"] { background: #2196F3; color: #fff; }
+        .tier-select option[value="2"] { background: #4CAF50; color: #fff; }
+        .tier-select option[value="3"] { background: #FFEB3B; color: #333; }
+        .tier-select option[value="4"] { background: #FF9800; color: #fff; }
+        .tier-select option[value="5"] { background: #F44336; color: #fff; }
+        .timer-wrap { display: inline-flex; align-items: center; gap: 3px; border: 1px solid #ccc;
+                      border-radius: 4px; padding: 1px 4px; background: #fff; }
+        .timer-wrap.running { border-color: #4CAF50; background: #F1F8E9; }
+        .timer-btn, .timer-reset { border: none; background: none; cursor: pointer; font-size: 12px; padding: 2px 3px; }
+        .timer-reset { color: #999; font-size: 11px; }
+        .timer-display { font-size: 12px; font-variant-numeric: tabular-nums; min-width: 38px; text-align: right; }
+        tr.pb-row td { background: #E8EDF2 !important; border-top: 2px dashed #90A4AE; border-bottom: 2px dashed #90A4AE; }
+        tr.pb-row td.col-htr, tr.pb-row td.col-corrected { text-align: center; color: #546E7A;
+                       font-size: 11px; letter-spacing: .15em; }
         .mu-hc     { border-style: dashed; border-color: #555; }
         .mu-nadd   { color: #1B7A34; text-decoration: underline double; text-underline-offset: 2px; }
         .mu-supp   { font-style: italic; color: #777; }
@@ -1617,7 +1640,7 @@
 <div id="newtDevBadge" style="position:fixed; left:10px; bottom:10px; z-index:99999;
      background:#C0392B; color:#fff; font:bold 12px/1 system-ui,sans-serif;
      padding:6px 10px; border-radius:4px; box-shadow:0 1px 4px rgba(0,0,0,.3);
-     pointer-events:none; letter-spacing:.04em;">DEV BUILD v1.27-dev8 — test version</div>
+     pointer-events:none; letter-spacing:.04em;">DEV BUILD v1.27-dev9 — test version</div>
 <!-- ── END DEV BUILD BADGE ── -->
 
 <!-- ── Migration banner (v29a) ────────────────────────────────────────
@@ -1700,10 +1723,23 @@
       <button class="t-plus" onclick="newUnitPrompt()" title="New unit">+</button>
       <button class="t-icon-btn" onclick="renameFolio()" title="Rename unit">✏</button>
       <button class="t-icon-btn t-icon-del" onclick="deleteFolio()" id="deleteFolioBtn" title="Delete unit">🗑</button>
+      <select id="tierSelect" class="tier-select" onchange="onTierChange()" title="Difficulty tier for this unit">
+        <option value="">Tier –</option>
+        <option value="1">Tier 1</option>
+        <option value="2">Tier 2</option>
+        <option value="3">Tier 3</option>
+        <option value="4">Tier 4</option>
+        <option value="5">Tier 5</option>
+      </select>
       <button id="clusterBadge" class="cluster-badge" onclick="openClusterModal()"
               title="Assign or view cluster for this folio" style="font-size:11px; padding:4px 8px;">
         🔗 <span id="clusterBadgeLabel">+ Cluster</span>
       </button>
+      <span id="timerWrap" class="timer-wrap" style="display:none" title="Time spent on this unit (Settings → Features → Timer)">
+        <button id="timerBtn" class="timer-btn" onclick="toggleTimer()" title="Start / pause timer for this unit">▶</button>
+        <span id="timerDisplay" class="timer-display">0:00</span>
+        <button class="timer-reset" onclick="resetTimer()" title="Reset this unit's timer">↺</button>
+      </span>
     </div>
 
     <div class="r1-sep"></div>
@@ -3729,8 +3765,18 @@ function saveWork() {
             if (prev.cluster)          saveData.cluster          = prev.cluster;
             if (prev.clusterCert)      saveData.clusterCert      = prev.clusterCert;
             if (prev.proposedGrouping) saveData.proposedGrouping = prev.proposedGrouping;
+            if (prev.tier)             saveData.tier             = prev.tier;
+            if (prev.timeSeconds)      saveData.timeSeconds      = prev.timeSeconds;
         }
     } catch(e) { /* no existing data, fine */ }
+    // v1.27: current tier/timer belong to this unit
+    if (_metaUnit === folioId || !_metaUnit) {
+        _metaUnit = folioId;
+        const _t = document.getElementById('tierSelect').value;
+        if (_t) saveData.tier = parseInt(_t, 10); else delete saveData.tier;
+        const _sec = _timerTotal();
+        if (_sec > 0) saveData.timeSeconds = _sec; else delete saveData.timeSeconds;
+    }
     
     try {
         localStorage.setItem(STORAGE_PREFIX + folioId, JSON.stringify(saveData));
@@ -3840,6 +3886,7 @@ function renameFolio() {
         }
     }
 
+    if (_metaUnit === oldId) _metaUnit = trimmed;
     showStatus('✏️ Folio renamed: "' + oldId + '" → "' + trimmed + '"', 'success');
 }
 
@@ -4005,6 +4052,8 @@ function loadWork() {
     
     // Sync column visibility after loading
     syncColumnVisibility();
+    refreshPageBreaks();
+    _metaAfterLoad(folioId, saveData);
     showStatus('✅ Loaded: "' + folioId + '" (last saved: ' + savedDate.toLocaleString() + ')', 'success');
 }
 
@@ -4247,6 +4296,11 @@ function exportMarkdown(dest) {
         
         let output = '# Folio ' + folioId + ' - Corrected Transcription\n\n';
         output += '**Generated:** ' + new Date().toLocaleString() + '\n\n';
+        // v1.27: tier and time
+        const _tierV = document.getElementById('tierSelect').value;
+        if (_tierV) output += '**Tier:** ' + _tierV + '\n\n';
+        const _secV = _timerTotal();
+        if (_secV > 0) output += '**Time:** ' + (_secV / 60).toFixed(1) + ' min (' + _fmtTime(_secV) + ')\n\n';
         output += '---\n\n';
         
         let lineCount = 0;
@@ -4255,6 +4309,7 @@ function exportMarkdown(dest) {
             const lineNum = row.cells[1].textContent;
             const correctedCell = row.cells[3]; // Column 3 is Corrected
             const notes = row.cells[5].textContent.trim(); // Column 5 is Notes
+            if (row.classList.contains('pb-row')) { output += '\n[PAGE BREAK]\n\n'; continue; }   // v1.27
             
             // Get the RAW text content, preserving markup symbols
             let corrected = '';
@@ -4441,6 +4496,7 @@ function exportHTR(dest, format) {
                 const row = tbody.rows[i];
                 const lineNum = row.cells[1].textContent.trim();
                 const htrText = row.cells[2].textContent.trim(); // Column 2 is HTR
+                if (row.classList.contains('pb-row')) { output += '[PAGE BREAK]\n\n'; continue; }   // v1.27
 
                 if (htrText && htrText !== 'undefined') {
                     lineCount++;
@@ -4463,6 +4519,7 @@ function exportHTR(dest, format) {
                 const row = tbody.rows[i];
                 const lineNum = row.cells[1].textContent.trim();
                 const htrText = row.cells[2].textContent.trim();
+                if (row.classList.contains('pb-row')) { output += '[PAGE BREAK]\n'; continue; }   // v1.27
 
                 if (htrText && htrText !== 'undefined') {
                     lineCount++;
@@ -4509,6 +4566,7 @@ function exportTEI(dest) {
         const lineNum = row.cells[1].textContent;
         const correctedCell = row.cells[3]; // Column 3 is Corrected
         const notes = row.cells[5].textContent.trim(); // Column 5 is Notes
+        if (row.classList.contains('pb-row')) { xml += '          <pb/>\n'; continue; }   // v1.27
         
         if (correctedCell.textContent.trim()) {
             // Add note as XML comment before the line
@@ -4760,6 +4818,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 option.selected = true;
                 select.insertBefore(option, select.options[2]);
                 
+                _metaAfterLoad(newFolio.trim(), null);
                 showStatus('Folio "' + newFolio.trim() + '" created. You can now paste!', 'success');
                 
                 // Keep focus on cell for immediate pasting
@@ -4938,6 +4997,7 @@ function checkFolioOverwrite(folioId) {
 }
 
 function handleFolioChange() {
+    _metaBeforeSwitch();   // v1.27: pause timer / save tier for the unit being left
     const select = document.getElementById('folioId');
     const value = select.value;
     const currentIndex = select.selectedIndex;
@@ -4996,6 +5056,7 @@ function handleFolioChange() {
             
             // Clear table for new folio
             newPage(true, true); // Skip confirmation and prompt (already done above)
+            _metaAfterLoad(customValue.trim(), null);
             showStatus('Ready for new folio: ' + customValue.trim(), 'success');
             // Update previousFolioIndex to this new selection
             previousFolioIndex = select.selectedIndex;
@@ -5030,16 +5091,10 @@ document.addEventListener('DOMContentLoaded', () => {
     select.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
-            const customValue = prompt('Enter new folio ID:', '');
-            if (customValue && customValue.trim()) {
-                if (!checkFolioOverwrite(customValue.trim())) return;
-                // Add as new option
-                const option = document.createElement('option');
-                option.value = customValue.trim();
-                option.textContent = customValue.trim() + ' (new)';
-                option.selected = true;
-                select.insertBefore(option, select.options[1]);
-            }
+            // v1.27: use the normal new-unit flow, which clears the table.
+            // Previously this added the new unit but kept the previous unit's
+            // text on screen, so a Save copied it into the new unit.
+            newUnitPrompt();
         }
     });
 });
@@ -5088,6 +5143,7 @@ function newPage(skipConfirm = false, skipPrompt = false) {
             option.textContent = newFolio.trim() + ' (new)';
             option.selected = true;
             select.insertBefore(option, select.options[2]);
+            _metaAfterLoad(newFolio.trim(), null);
             
             showStatus('New page ready for folio "' + newFolio.trim() + '" - Paste your HTR!', 'success');
         } else {
@@ -5110,20 +5166,26 @@ function renumberDuplicates() {
     const rows = Array.from(tbody.rows);
     
     // Group row indices by their base integer
+    // v1.27: numbering restarts after each page break, so duplicates are
+    // only looked for within the same page section
     const groups = {};
+    let section = 0;
     rows.forEach((row, idx) => {
+        if (row.classList.contains('pb-row')) { section++; return; }
         const cell = row.cells[1];
         const num = cell ? parseFloat(cell.textContent) : NaN;
         if (isNaN(num)) return;
         const base = Math.floor(num);
-        if (!groups[base]) groups[base] = [];
-        groups[base].push(idx);
+        const key = section + ':' + base;
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(idx);
     });
     
     // For each base that has more than one row, renumber in document order
     let changed = 0;
-    for (const base in groups) {
-        const idxList = groups[base];
+    for (const key in groups) {
+        const idxList = groups[key];
+        const base = key.split(':')[1];
         if (idxList.length > 1) {
             idxList.forEach((rowIdx, k) => {
                 const newNum = Math.round((parseInt(base) + (k + 1) * 0.1) * 10) / 10;
@@ -5495,8 +5557,12 @@ document.addEventListener('paste', function(e) {
         startLineNum = targetLineNum;
     }
 
+    let _nextNum = startLineNum;   // v1.27: numbering restarts at 1 after a [PAGE BREAK]
     lines.forEach((line, index) => {
-        const lineNum = startLineNum + index;
+        const isPB = PB_RE.test(line);
+        if (isPB) line = '[PAGE BREAK]';
+        const lineNum = isPB ? '' : _nextNum++;
+        if (isPB) _nextNum = 1;
         const rowIndex = startRowIndex + index;
 
         let row;
@@ -5522,6 +5588,14 @@ document.addEventListener('paste', function(e) {
         }
     });
 
+    // v1.27: keep numbering the empty rows below the pasted block in sequence
+    // (so after a page break they continue 3, 4… rather than the old numbers)
+    for (let r = startRowIndex + lines.length; r < tbody.rows.length; r++) {
+        const row = tbody.rows[r];
+        if (row.cells[2].textContent.trim() || row.cells[3].textContent.trim()) break;
+        row.cells[1].textContent = _nextNum++;
+    }
+    refreshPageBreaks();
     showStatus('Pasted ' + lines.length + ' lines starting at row ' + startLineNum + ' — Remember to Save!', 'success');
 });
 
@@ -5626,6 +5700,134 @@ function insertSymbol(symbol) {
     _rememberCaret(savedCell);
 }
 
+
+// ═══════════════════════════════════════════════════════════════════
+// v1.27 batch D — per-unit tier and timer
+// Stored inside the unit's own record as `tier` (1–5) and `timeSeconds`.
+// Written straight to the record when they change (no Save needed), and
+// also included by saveWork().
+// ═══════════════════════════════════════════════════════════════════
+let _metaUnit = null;        // unit the tier/timer currently belong to
+let _timerAccum = 0;         // seconds accumulated before the current run
+let _timerStartedAt = null;  // ms timestamp of current run, or null if paused
+let _timerTick = null;
+
+function _timerTotal() {
+    return _timerAccum + (_timerStartedAt ? Math.floor((Date.now() - _timerStartedAt) / 1000) : 0);
+}
+function _fmtTime(sec) {
+    const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s2 = sec % 60;
+    return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(s2).padStart(2, '0');
+}
+function _renderTimer() {
+    const d = document.getElementById('timerDisplay'), b = document.getElementById('timerBtn'),
+          w = document.getElementById('timerWrap');
+    if (d) d.textContent = _fmtTime(_timerTotal());
+    if (b) b.textContent = _timerStartedAt ? '⏸' : '▶';
+    if (w) w.classList.toggle('running', !!_timerStartedAt);
+}
+function _currentUnitOK() {
+    const v = (document.getElementById('folioId') || {}).value;
+    return v && v !== '_new_';
+}
+function _persistUnitMeta() {
+    if (!_metaUnit) return;
+    const key = STORAGE_PREFIX + _metaUnit;
+    const raw = localStorage.getItem(key);
+    if (!raw) return;                       // unit not saved yet — saveWork() will include it
+    try {
+        const obj = JSON.parse(raw);
+        const t = document.getElementById('tierSelect').value;
+        if (t) obj.tier = parseInt(t, 10); else delete obj.tier;
+        const sec = _timerTotal();
+        if (sec > 0) obj.timeSeconds = sec; else delete obj.timeSeconds;
+        localStorage.setItem(key, JSON.stringify(obj));
+    } catch (e) { console.warn('Could not save tier/timer:', e); }
+}
+function toggleTimer() { _timerStartedAt ? pauseTimer() : startTimer(); }
+function startTimer() {
+    if (!_currentUnitOK()) { showStatus('Select or create a unit first', 'error'); return; }
+    if (!_metaUnit) _metaUnit = document.getElementById('folioId').value;
+    _timerStartedAt = Date.now();
+    clearInterval(_timerTick);
+    let n = 0;
+    _timerTick = setInterval(function() {
+        _renderTimer();
+        if (++n % 30 === 0) _persistUnitMeta();   // safety save every 30 s
+    }, 1000);
+    _renderTimer();
+}
+function pauseTimer() {
+    if (_timerStartedAt) { _timerAccum = _timerTotal(); _timerStartedAt = null; }
+    clearInterval(_timerTick); _timerTick = null;
+    _persistUnitMeta();
+    _renderTimer();
+}
+function resetTimer() {
+    if (!confirm('Reset the timer for this unit to 0:00?')) return;
+    clearInterval(_timerTick); _timerTick = null;
+    _timerStartedAt = null; _timerAccum = 0;
+    _persistUnitMeta();
+    _renderTimer();
+}
+function _styleTierSelect() {
+    const sel = document.getElementById('tierSelect');
+    if (!sel) return;
+    sel.className = 'tier-select' + (sel.value ? ' t' + sel.value : '');
+}
+function onTierChange() {
+    if (!_metaUnit && _currentUnitOK()) _metaUnit = document.getElementById('folioId').value;
+    _styleTierSelect();
+    _persistUnitMeta();
+}
+// Called before switching unit or project: pause and save to the unit we are leaving
+function _metaBeforeSwitch() {
+    if (_timerStartedAt) pauseTimer(); else _persistUnitMeta();
+}
+// Called once a unit is loaded (saveData) or created (null)
+function _metaAfterLoad(unitId, saveData) {
+    clearInterval(_timerTick); _timerTick = null;
+    _metaUnit = unitId || null;
+    _timerAccum = (saveData && saveData.timeSeconds) || 0;
+    _timerStartedAt = null;
+    const sel = document.getElementById('tierSelect');
+    if (sel) sel.value = (saveData && saveData.tier) ? String(saveData.tier) : '';
+    _styleTierSelect();
+    _renderTimer();
+}
+window.addEventListener('beforeunload', function() {
+    if (_timerStartedAt) { _timerAccum = _timerTotal(); _timerStartedAt = null; }
+    _persistUnitMeta();
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// v1.27 batch D — page breaks
+// A row whose text is just [PAGE BREAK] is shown as an unnumbered divider;
+// line numbering restarts at 1 after it (on paste). Stored as plain text,
+// so older Newt versions simply show it as a normal row.
+// ═══════════════════════════════════════════════════════════════════
+const PB_RE = /^\s*(?:\d+[.)]?\s+)?\[PAGE BREAK\]\s*$/i;
+function _isPageBreakRow(row) {
+    if (!row || !row.cells || row.cells.length < 4) return false;
+    const htr = row.cells[2].textContent || '';
+    const cor = row.cells[3].dataset.originalMarkup || row.cells[3].textContent || '';
+    return PB_RE.test(htr) || PB_RE.test(cor);
+}
+function refreshPageBreaks() {
+    const tbody = document.getElementById('tableBody');
+    if (!tbody) return;
+    for (const row of tbody.rows) {
+        const pb = _isPageBreakRow(row);
+        row.classList.toggle('pb-row', pb);
+        if (pb && row.cells[1].textContent !== '') row.cells[1].textContent = '';
+    }
+}
+document.addEventListener('blur', function(e) {
+    if (e.target && e.target.classList &&
+        (e.target.classList.contains('col-htr') || e.target.classList.contains('col-corrected'))) {
+        setTimeout(refreshPageBreaks, 0);
+    }
+}, true);
 
 // v1.27 batch C — unknown sign: insert {sign:unknown|} and leave the cursor
 // after the |, so a description can be typed (or left empty)
@@ -6417,6 +6619,8 @@ function switchToProject(id) {
     for (var i = 0; i < registry.length; i++) { if (registry[i].id === id) { entry = registry[i]; break; } }
     if (!entry) { showStatus('Project not found: ' + id, 'error'); return; }
 
+    _metaBeforeSwitch();          // v1.27: save timer/tier under the old project first
+    _metaAfterLoad(null, null);
     ACTIVE_PROJECT_ID = id;
     STORAGE_PREFIX    = entry.storagePrefix || ('newt_' + id + '_');
     localStorage.setItem(GLOBAL_ACTIVE_KEY, id);
@@ -7578,6 +7782,12 @@ function applySettingsToUI(cfg) {
 
 function applyFeatureFlags() {
     var features = (getActiveProject().features) || {};
+    // v1.27: timer is shown/hidden rather than greyed out
+    var _tw = document.getElementById('timerWrap');
+    if (_tw) {
+        _tw.style.display = features.timer ? 'inline-flex' : 'none';
+        if (!features.timer && typeof _timerStartedAt !== 'undefined' && _timerStartedAt) pauseTimer();
+    }
     var pillMap = { katex: 'pillLatex', geneticEncoding: 'pillGenetic',
                     clusterAssignment: 'pillClusters' };
     Object.entries(pillMap).forEach(function(pair) {
@@ -9156,6 +9366,10 @@ function exportClusterJSON() {
       </div>
       <div class="s-toggle-row" data-feature="clusterAssignment">
         <div><div class="s-toggle-name">Clusters</div><div class="s-toggle-desc">Assign units to named clusters or sections</div></div>
+        <div class="s-toggle" onclick="toggleFeature(this)"></div>
+      </div>
+      <div class="s-toggle-row" data-feature="timer">
+        <div><div class="s-toggle-name">Timer</div><div class="s-toggle-desc">Time spent on each unit, with start / pause in the top row</div></div>
         <div class="s-toggle" onclick="toggleFeature(this)"></div>
       </div>
       <div class="s-toggle-row" data-feature="propositionMapping">
