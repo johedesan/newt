@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>[DEV] Newt — Newton Manuscript Correction Interface v1.27-dev5</title>
+    <title>[DEV] Newt — Newton Manuscript Correction Interface v1.27-dev6</title>
 
-    <!-- Newt v1.27-dev5 — see CHANGELOG.md -->
+    <!-- Newt v1.27-dev6 — see CHANGELOG.md -->
 
     <!-- Cache-control hints for GitHub Pages, which doesn't allow setting real
          HTTP cache headers. Meta tags are honoured inconsistently across
@@ -1603,7 +1603,7 @@
 <div id="newtDevBadge" style="position:fixed; left:10px; bottom:10px; z-index:99999;
      background:#C0392B; color:#fff; font:bold 12px/1 system-ui,sans-serif;
      padding:6px 10px; border-radius:4px; box-shadow:0 1px 4px rgba(0,0,0,.3);
-     pointer-events:none; letter-spacing:.04em;">DEV BUILD v1.27-dev5 — test version</div>
+     pointer-events:none; letter-spacing:.04em;">DEV BUILD v1.27-dev6 — test version</div>
 <!-- ── END DEV BUILD BADGE ── -->
 
 <!-- ── Migration banner (v29a) ────────────────────────────────────────
@@ -1733,7 +1733,36 @@
           <input type="checkbox" id="chkGeo" onchange="toggleGeoGroup(this.checked)">
           Geometry — v &nbsp;p &nbsp;l &nbsp;f
         </label>
+        <label class="add-option">
+          <input type="checkbox" id="chkExtra" onchange="toggleExtraGroup(this.checked)">
+          Extra markup — ab &nbsp;nadd &nbsp;supp
+        </label>
       </div>
+    </div>
+
+    <!-- v1.27: optional groups now sit on this row, next to Additional -->
+    <div id="r3-geo-sep" class="r3-sep" style="display:none;"></div>
+    <span id="r3-geo-label" class="r3-label" style="display:none;">geo:</span>
+    <div id="r3-geo" class="r3-group" style="display:none;">
+      <button onmousedown="wrapVariable(event); return false;" class="mu-btn mu-geo"
+              title="Variable — scalar magnitude: {v:text}">v</button>
+      <button onmousedown="wrapPoint(event); return false;" class="mu-btn mu-geo"
+              title="Point — geometric vertex: {p:text}">p</button>
+      <button onmousedown="wrapLine(event); return false;" class="mu-btn mu-geo"
+              title="Line segment — two-letter label: {l:text}">l</button>
+      <button onmousedown="wrapFigure(event); return false;" class="mu-btn mu-geo"
+              title="Figure / polygon: {f:text}">f</button>
+    </div>
+
+    <div id="r2-extra-sep" class="r3-sep" style="display:none;"></div>
+    <span id="r2-extra-label" class="r3-label" style="display:none;">extra:</span>
+    <div id="r2-extra" class="r3-group" style="display:none;">
+      <button onmousedown="wrapAbbreviation(event); return false;" class="mu-btn"
+              title="Abbreviation + expansion: {abbr:text|expansion}">ab</button>
+      <button onmousedown="wrapNestedAdd(event); return false;" class="mu-btn mu-nadd"
+              title="Addition inside an addition: {nadd:text} — use inside ^…^">nadd</button>
+      <button onmousedown="wrapSupplied(event); return false;" class="mu-btn mu-supp"
+              title="Supplied — letters not visible on the page (gutter, damage): {supp:text}">supp</button>
     </div>
   </div><!-- /r2 -->
 
@@ -1775,8 +1804,6 @@
               title="Bold in manuscript: {b:text}">b</button>
       <button onmousedown="wrapLatexInline(event); return false;" class="mu-btn mu-math"
               title="Wrap selection in LaTeX: $…$">$…$</button>
-      <button onmousedown="wrapAbbreviation(event); return false;" class="mu-btn"
-              title="Abbreviation + expansion: {abbr:text|expansion}">ab</button>
       <button onmousedown="wrapDataLayer(event); return false;" class="mu-btn mu-dl"
               title="Data layer flag: {DL:text}">DL</button>
       <button onmousedown="wrapMargin(event); return false;" class="mu-btn mu-margin"
@@ -1796,10 +1823,6 @@
               title="Inline insertion at baseline: {in:text}">in</button>
       <button onmousedown="wrapHandChange(event); return false;" class="mu-btn mu-hc"
               title="Visible change of hand (no attribution): {hc:text}">hc</button>
-      <button onmousedown="wrapNestedAdd(event); return false;" class="mu-btn mu-nadd"
-              title="Addition inside an addition: {nadd:text} — use inside ^…^">nadd</button>
-      <button onmousedown="wrapSupplied(event); return false;" class="mu-btn mu-supp"
-              title="Supplied — letters not visible on the page (gutter, damage): {supp:text}">supp</button>
     </div>
 
     <div class="r3-sep-wide"></div>
@@ -1815,20 +1838,6 @@
               title="Transform selected text to Sentence case &#x2014; first letter caps, rest lowercase">Aa</button>
       <button onmousedown="transformCase('lower'); return false;" class="mu-btn"
               title="Transform selected text to all lowercase">aa</button>
-    </div>
-
-    <div id="r3-geo-sep" class="r3-sep" style="display:none;"></div>
-
-    <span id="r3-geo-label" class="r3-label" style="display:none;">geo:</span>
-    <div id="r3-geo" class="r3-group" style="display:none;">
-      <button onmousedown="wrapVariable(event); return false;" class="mu-btn mu-geo"
-              title="Variable — scalar magnitude: {v:text}">v</button>
-      <button onmousedown="wrapPoint(event); return false;" class="mu-btn mu-geo"
-              title="Point — geometric vertex: {p:text}">p</button>
-      <button onmousedown="wrapLine(event); return false;" class="mu-btn mu-geo"
-              title="Line segment — two-letter label: {l:text}">l</button>
-      <button onmousedown="wrapFigure(event); return false;" class="mu-btn mu-geo"
-              title="Figure / polygon: {f:text}">f</button>
     </div>
 
     <div id="r3-phase-sep" class="r3-sep" style="display:none;"></div>
@@ -6126,6 +6135,16 @@ function toggleGeoGroup(show) {
     localStorage.setItem(STORAGE_PREFIX + 'toolbar_geo', show ? '1' : '0');
 }
 
+// v1.27: Extra markup group (ab · nadd · supp) on the features row
+function toggleExtraGroup(show) {
+    ['r2-extra', 'r2-extra-sep', 'r2-extra-label'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.style.display = show ? (id === 'r2-extra' ? 'flex' : 'block') : 'none';
+    });
+    localStorage.setItem(STORAGE_PREFIX + 'toolbar_extra', show ? '1' : '0');
+}
+
 // (project creation handled by newProjectFlow(), below)
 
 // ═══════════════════════════════════════════════════════════════════
@@ -7559,7 +7578,7 @@ function getAllProjectUnits() {
         var key = localStorage.key(i);
         if (!key || !key.startsWith(STORAGE_PREFIX)) continue;
         var suffix = key.replace(STORAGE_PREFIX, '');
-        if (['clusters','project_config','toolbar_geo'].indexOf(suffix) >= 0) continue;
+        if (['clusters','project_config'].indexOf(suffix) >= 0 || suffix.indexOf('toolbar_') === 0) continue;
         try { units.push({ id: suffix, data: JSON.parse(localStorage.getItem(key)) }); } catch(e) {}
     }
     return units.sort(function(a,b) { return a.id.localeCompare(b.id, undefined, {numeric:true}); });
@@ -8189,6 +8208,11 @@ window.addEventListener('DOMContentLoaded', () => {
         toggleGeoGroup(true);
         const _chk = document.getElementById('chkGeo');
         if (_chk) _chk.checked = true;
+    }
+    if (localStorage.getItem(STORAGE_PREFIX + 'toolbar_extra') === '1') {
+        toggleExtraGroup(true);
+        const _chkX = document.getElementById('chkExtra');
+        if (_chkX) _chkX.checked = true;
     }
 });
 </script>
