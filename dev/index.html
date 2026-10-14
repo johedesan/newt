@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>[DEV] Newt — Newton Manuscript Correction Interface v1.27-dev4</title>
+    <title>[DEV] Newt — Newton Manuscript Correction Interface v1.27-dev5</title>
 
-    <!-- Newt v1.27-dev4 — see CHANGELOG.md -->
+    <!-- Newt v1.27-dev5 — see CHANGELOG.md -->
 
     <!-- Cache-control hints for GitHub Pages, which doesn't allow setting real
          HTTP cache headers. Meta tags are honoured inconsistently across
@@ -233,6 +233,10 @@
             text-decoration-thickness: 2px;
             text-underline-offset: 2px;
         }
+        .markup-bold { font-weight: 800; }
+        .markup-hc { outline: 1px dashed #555; outline-offset: 1px; border-radius: 2px; }
+        .markup-nadd { color: #1B7A34; text-decoration: underline double; text-underline-offset: 2px; }
+        .markup-supp { color: #777; font-style: italic; }
         .markup-overwrite {
             background: #FFF3E0;
             padding: 0 2px;
@@ -1226,6 +1230,20 @@
         .mu-ov     { background: #fff3e0; border-color: #E65100; color: #bf360c; }
         .mu-in     { background: #FFFDE7; border-color: #795548; color: #795548; }
         .mu-sd     { border-color: #c0392b; color: #c0392b; }
+        /* v1.27 batch A */
+        .mu-bold   { font-weight: 800; }
+        .mu-hc     { border-style: dashed; border-color: #555; }
+        .mu-nadd   { color: #1B7A34; text-decoration: underline double; text-underline-offset: 2px; }
+        .mu-supp   { font-style: italic; color: #777; }
+        .u-menu-wrap { position: relative; display: inline-block; }
+        .u-menu { display: none; position: absolute; top: 100%; left: 0; z-index: 1000; margin-top: 2px;
+                  background: #fff; border: 1px solid #ff9800; border-radius: 4px;
+                  box-shadow: 0 2px 8px rgba(0,0,0,.15); padding: 3px; min-width: 210px; }
+        .u-menu.open { display: block; }
+        .u-menu button { display: block; width: 100%; text-align: left; background: none; border: none;
+                         padding: 5px 8px; font-size: 12px; cursor: pointer; border-radius: 3px; white-space: nowrap; }
+        .u-menu button:hover { background: #fff3cd; }
+        .u-menu code { color: #8a5a00; font-size: 11px; }
         .mu-geo    { background: #f5f5f5; border-color: #bbb; color: #555; }
         .mu-phase  { background: #f0f0f0; border-color: #bbb; color: #444; }
         .mu-del    { color: #d32f2f; border-color: #f09595; }
@@ -1585,7 +1603,7 @@
 <div id="newtDevBadge" style="position:fixed; left:10px; bottom:10px; z-index:99999;
      background:#C0392B; color:#fff; font:bold 12px/1 system-ui,sans-serif;
      padding:6px 10px; border-radius:4px; box-shadow:0 1px 4px rgba(0,0,0,.3);
-     pointer-events:none; letter-spacing:.04em;">DEV BUILD v1.27-dev4 — test version</div>
+     pointer-events:none; letter-spacing:.04em;">DEV BUILD v1.27-dev5 — test version</div>
 <!-- ── END DEV BUILD BADGE ── -->
 
 <!-- ── Migration banner (v29a) ────────────────────────────────────────
@@ -1753,6 +1771,8 @@
               title="Mark addition: ^text^ · Cmd/Ctrl+↑">^add^</button>
       <button onmousedown="wrapUnderline(event); return false;" class="mu-btn mu-underline"
               title="Underlined in manuscript: {u:text}">u</button>
+      <button onmousedown="wrapBold(event); return false;" class="mu-btn mu-bold"
+              title="Bold in manuscript: {b:text}">b</button>
       <button onmousedown="wrapLatexInline(event); return false;" class="mu-btn mu-math"
               title="Wrap selection in LaTeX: $…$">$…$</button>
       <button onmousedown="wrapAbbreviation(event); return false;" class="mu-btn"
@@ -1761,14 +1781,25 @@
               title="Data layer flag: {DL:text}">DL</button>
       <button onmousedown="wrapMargin(event); return false;" class="mu-btn mu-margin"
               title="Marginal addition: {M:text}">M</button>
-      <button onmousedown="insertUnclear(); return false;" class="mu-btn mu-warn"
-              title="Mark unclear/illegible: [?text?]">U</button>
+      <span class="u-menu-wrap" id="uMenuWrap">
+        <button onmousedown="toggleUnclearMenu(); return false;" class="mu-btn mu-warn"
+                title="Uncertain reading: [?mid: text?] / [?low: text?] · illegible: [?unclear?]">U ▾</button>
+        <div class="u-menu" id="uMenu">
+          <button onmousedown="applyUnclear('mid'); return false;" title="Select the reading first">mid — fairly sure <code>[?mid: …?]</code></button>
+          <button onmousedown="applyUnclear('low'); return false;" title="Select the reading first">low — best guess <code>[?low: …?]</code></button>
+          <button onmousedown="applyUnclear('unclear'); return false;" title="Inserted at the cursor (replaces any selection)">illegible <code>[?unclear?]</code></button>
+        </div>
+      </span>
       <button onmousedown="wrapOverwrite(event); return false;" class="mu-btn mu-ov"
-              title="Overwrite — text written over illegible base: {ov:text}">ov</button>
+              title="Overwrite: {ov:new|old} — select the visible (overwriting) text; type what is underneath after | if you can read it, or leave it empty">ov</button>
       <button onmousedown="wrapInline(event); return false;" class="mu-btn mu-in"
               title="Inline insertion at baseline: {in:text}">in</button>
-      <button onclick="applySDToCurrentRow()" class="mu-btn mu-sd"
-              title="Toggle section deletion for this row">🗑 SD</button>
+      <button onmousedown="wrapHandChange(event); return false;" class="mu-btn mu-hc"
+              title="Visible change of hand (no attribution): {hc:text}">hc</button>
+      <button onmousedown="wrapNestedAdd(event); return false;" class="mu-btn mu-nadd"
+              title="Addition inside an addition: {nadd:text} — use inside ^…^">nadd</button>
+      <button onmousedown="wrapSupplied(event); return false;" class="mu-btn mu-supp"
+              title="Supplied — letters not visible on the page (gutter, damage): {supp:text}">supp</button>
     </div>
 
     <div class="r3-sep-wide"></div>
@@ -1820,15 +1851,18 @@
         <div class="help-row"><span class="help-key">Enter (in unit dropdown)</span><span class="help-desc">create new unit</span></div>
         <div class="help-divider"></div>
         <div class="help-section-title">Button reference</div>
-        <div class="help-row"><span class="help-key">U</span><span class="help-desc">[unclear] — illegible text</span></div>
+        <div class="help-row"><span class="help-key">U ▾</span><span class="help-desc">[?mid: …?] / [?low: …?] uncertain · [?unclear?] illegible</span></div>
+        <div class="help-row"><span class="help-key" style="font-weight:800">b</span><span class="help-desc">bold in manuscript</span></div>
+        <div class="help-row"><span class="help-key">hc</span><span class="help-desc">visible change of hand (no attribution)</span></div>
+        <div class="help-row"><span class="help-key">nadd</span><span class="help-desc">addition inside an addition</span></div>
+        <div class="help-row"><span class="help-key">supp</span><span class="help-desc">supplied — letters not visible</span></div>
         <div class="help-row"><span class="help-key">$&hellip;$</span><span class="help-desc">inline LaTeX</span></div>
         <div class="help-row"><span class="help-key">ab</span><span class="help-desc">abbreviation + expansion</span></div>
         <div class="help-row"><span class="help-key">DL</span><span class="help-desc">data layer flag</span></div>
         <div class="help-row"><span class="help-key">M</span><span class="help-desc">marginal addition</span></div>
         <div class="help-row"><span class="help-key" style="text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:3px;">u</span><span class="help-desc">underlined in manuscript</span></div>
-        <div class="help-row"><span class="help-key">ov</span><span class="help-desc">overwrite — written over illegible text</span></div>
+        <div class="help-row"><span class="help-key">ov</span><span class="help-desc">overwrite {ov:new|old} — old optional</span></div>
         <div class="help-row"><span class="help-key">in</span><span class="help-desc">inline insertion at baseline</span></div>
-        <div class="help-row"><span class="help-key">SD</span><span class="help-desc">toggle section deletion (whole row)</span></div>
         <div class="help-row"><span class="help-key">v &nbsp;p &nbsp;l &nbsp;f</span><span class="help-desc">variable / point / line / figure</span></div>
         <div class="help-row"><span class="help-key">P0&ndash;P3, P?</span><span class="help-desc">genetic encoding phase</span></div>
         <div class="help-note">Markup buttons only apply within the Corrected Text column.</div>
@@ -3798,6 +3832,14 @@ function convertHTMLToMarkup(htmlString) {
                     result += '{M:' + inner + '}';
                 } else if (node.classList.contains('markup-underline')) {
                     result += '{u:' + node.textContent + '}';
+                } else if (node.classList.contains('markup-bold')) {
+                    result += '{b:' + convertElement(node) + '}';
+                } else if (node.classList.contains('markup-hc')) {
+                    result += '{hc:' + convertElement(node) + '}';
+                } else if (node.classList.contains('markup-nadd')) {
+                    result += '{nadd:' + convertElement(node) + '}';
+                } else if (node.classList.contains('markup-supp')) {
+                    result += '{supp:' + convertElement(node) + '}';
                 } else if (node.classList.contains('markup-variable')) {
                     result += '{v:' + convertElement(node) + '}';
                 } else if (node.classList.contains('markup-point')) {
@@ -4578,6 +4620,11 @@ function renderMarkup(cell) {
     // Render {u:text} as underlined (matches manuscript underlining) - no text label needed,
     // the underline styling itself is the meaning, unlike the abstract DL/M/ov/in categories
     html = html.replace(/\{u:([^}]+)\}/g, '<span class="markup-underline">$1</span>');
+    // v1.27 batch A
+    html = html.replace(/\{b:([^}]+)\}/g, '<span class="markup-bold">$1</span>');
+    html = html.replace(/\{hc:([^}]+)\}/g, '<span class="markup-hc" title="change of hand">$1</span>');
+    html = html.replace(/\{nadd:([^}]+)\}/g, '<span class="markup-nadd" title="addition inside an addition">$1</span>');
+    html = html.replace(/\{supp:([^}]+)\}/g, '<span class="markup-supp" title="supplied (not visible)">$1</span>');
     // Render {ov:text} as orange overwrite flag
     html = html.replace(/\{ov:([^}]+)\}/g, '<span class="markup-overwrite">ov:$1</span>');
     html = html.replace(/\{in:([^}]+)\}/g, '<span class="markup-inline">in:$1</span>');
@@ -5539,7 +5586,52 @@ function wrapUnderline(event) {
 
 function wrapOverwrite(event) {
     if (event) event.preventDefault();
-    wrapSelectionWith('{ov:', '}', 'Overwrite (text written over illegible base)');
+    // v1.27: {ov:new|old} — 'old' (what is underneath) is optional. Insert
+    // {ov:selection|} and leave the cursor after the |, ready to type it.
+    if (wrapSelectionWith('{ov:', '|}', 'Overwrite — type what is underneath after | (or leave empty)') === true) {
+        const sel = window.getSelection();
+        if (sel && sel.modify) sel.modify('move', 'backward', 'character');
+    }
+}
+
+// v1.27 batch A — new wrap buttons
+function wrapBold(event)       { if (event) event.preventDefault(); wrapSelectionWith('{b:', '}', 'Bold in manuscript'); }
+function wrapHandChange(event) { if (event) event.preventDefault(); wrapSelectionWith('{hc:', '}', 'Change of hand'); }
+function wrapNestedAdd(event)  { if (event) event.preventDefault(); wrapSelectionWith('{nadd:', '}', 'Addition inside an addition'); }
+function wrapSupplied(event)   { if (event) event.preventDefault(); wrapSelectionWith('{supp:', '}', 'Supplied (not visible)'); }
+
+// v1.27 batch A — U chooser: mid / low / illegible
+function toggleUnclearMenu() {
+    const m = document.getElementById('uMenu');
+    if (m) m.classList.toggle('open');
+}
+function closeUnclearMenu() {
+    const m = document.getElementById('uMenu');
+    if (m) m.classList.remove('open');
+}
+document.addEventListener('mousedown', function(e) {
+    const w = document.getElementById('uMenuWrap');
+    if (w && !w.contains(e.target)) closeUnclearMenu();
+});
+function applyUnclear(level) {
+    closeUnclearMenu();
+    const sel = window.getSelection();
+    const node = sel && sel.anchorNode;
+    const el = node ? (node.nodeType === Node.TEXT_NODE ? node.parentElement : node) : null;
+    const cell = el ? el.closest('.editable') : null;
+    if (!cell) { showStatus('Click or select in a Corrected Text cell first', 'error'); return; }
+    if (!cell.classList.contains('col-corrected')) {
+        showStatus('Markup can only be applied in the Corrected Text column', 'error'); return;
+    }
+    if (level === 'unclear') {
+        document.execCommand('insertText', false, '[?unclear?]');
+        showStatus('Illegible: [?unclear?] inserted', 'success');
+        return;
+    }
+    const txt = sel.toString().trim();
+    if (!txt) { showStatus('Select the uncertain reading first', 'error'); return; }
+    document.execCommand('insertText', false, '[?' + level + ': ' + txt + '?]');
+    showStatus('Uncertain reading marked (' + level + ')', 'success');
 }
 
 function wrapInline(event) {
@@ -5568,6 +5660,7 @@ function wrapSelectionWith(prefix, suffix, type) {
     }
     document.execCommand('insertText', false, prefix + txt + suffix);
     showStatus(type + ' marked', 'success');
+    return true;
 }
 
 // ═══════════════════════════════════════════════════════════════════
