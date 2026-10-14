@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>[DEV] Newt — Newton Manuscript Correction Interface v1.27-dev6</title>
+    <title>[DEV] Newt — Newton Manuscript Correction Interface v1.27-dev7</title>
 
-    <!-- Newt v1.27-dev6 — see CHANGELOG.md -->
+    <!-- Newt v1.27-dev7 — see CHANGELOG.md -->
 
     <!-- Cache-control hints for GitHub Pages, which doesn't allow setting real
          HTTP cache headers. Meta tags are honoured inconsistently across
@@ -234,6 +234,18 @@
             text-underline-offset: 2px;
         }
         .markup-bold { font-weight: 800; }
+        /* v1.27 batch B — structure: tag shown via ::before so it is not part of the text */
+        .markup-marginb { background: #F0E6FF; border-radius: 2px; color: #4A0080; }
+        .markup-marginb::before { content: "margin: "; font-size: 0.8em; opacity: .7; }
+        .markup-head::before, .markup-lab::before, .markup-al::before, .markup-cw::before {
+            font-size: 0.7em; font-weight: 600; color: #fff; background: #607D8B;
+            border-radius: 2px; padding: 0 3px; margin-right: 3px; vertical-align: 1px; }
+        .markup-head::before { content: "H"; }
+        .markup-head { font-weight: 600; }
+        .markup-lab::before  { content: "L"; }
+        .markup-al::before   { content: "AL"; }
+        .markup-al { border-left: 2px solid #607D8B; padding-left: 3px; }
+        .markup-cw::before   { content: "cw"; }
         .markup-hc { outline: 1px dashed #555; outline-offset: 1px; border-radius: 2px; }
         .markup-nadd { color: #1B7A34; text-decoration: underline double; text-underline-offset: 2px; }
         .markup-supp { color: #777; font-style: italic; }
@@ -1232,6 +1244,7 @@
         .mu-sd     { border-color: #c0392b; color: #c0392b; }
         /* v1.27 batch A */
         .mu-bold   { font-weight: 800; }
+        .mu-struct { border-color: #607D8B; color: #37474F; font-weight: 600; }
         .mu-hc     { border-style: dashed; border-color: #555; }
         .mu-nadd   { color: #1B7A34; text-decoration: underline double; text-underline-offset: 2px; }
         .mu-supp   { font-style: italic; color: #777; }
@@ -1603,7 +1616,7 @@
 <div id="newtDevBadge" style="position:fixed; left:10px; bottom:10px; z-index:99999;
      background:#C0392B; color:#fff; font:bold 12px/1 system-ui,sans-serif;
      padding:6px 10px; border-radius:4px; box-shadow:0 1px 4px rgba(0,0,0,.3);
-     pointer-events:none; letter-spacing:.04em;">DEV BUILD v1.27-dev6 — test version</div>
+     pointer-events:none; letter-spacing:.04em;">DEV BUILD v1.27-dev7 — test version</div>
 <!-- ── END DEV BUILD BADGE ── -->
 
 <!-- ── Migration banner (v29a) ────────────────────────────────────────
@@ -1731,11 +1744,11 @@
         <div class="add-panel-title">Optional toolbar groups</div>
         <label class="add-option">
           <input type="checkbox" id="chkGeo" onchange="toggleGeoGroup(this.checked)">
-          Geometry — v &nbsp;p &nbsp;l &nbsp;f
+          Geometry
         </label>
         <label class="add-option">
           <input type="checkbox" id="chkExtra" onchange="toggleExtraGroup(this.checked)">
-          Extra markup — ab &nbsp;nadd &nbsp;supp
+          Extra Markup
         </label>
       </div>
     </div>
@@ -1763,6 +1776,8 @@
               title="Addition inside an addition: {nadd:text} — use inside ^…^">nadd</button>
       <button onmousedown="wrapSupplied(event); return false;" class="mu-btn mu-supp"
               title="Supplied — letters not visible on the page (gutter, damage): {supp:text}">supp</button>
+      <button onmousedown="wrapCatchword(event); return false;" class="mu-btn mu-struct"
+              title="Catchword: {cw:text}">cw</button>
     </div>
   </div><!-- /r2 -->
 
@@ -1806,8 +1821,6 @@
               title="Wrap selection in LaTeX: $…$">$…$</button>
       <button onmousedown="wrapDataLayer(event); return false;" class="mu-btn mu-dl"
               title="Data layer flag: {DL:text}">DL</button>
-      <button onmousedown="wrapMargin(event); return false;" class="mu-btn mu-margin"
-              title="Marginal addition: {M:text}">M</button>
       <span class="u-menu-wrap" id="uMenuWrap">
         <button onmousedown="toggleUnclearMenu(); return false;" class="mu-btn mu-warn"
                 title="Uncertain reading: [?mid: text?] / [?low: text?] · illegible: [?unclear?]">U ▾</button>
@@ -1823,6 +1836,20 @@
               title="Inline insertion at baseline: {in:text}">in</button>
       <button onmousedown="wrapHandChange(event); return false;" class="mu-btn mu-hc"
               title="Visible change of hand (no attribution): {hc:text}">hc</button>
+    </div>
+
+    <div class="r3-sep"></div>
+
+    <span class="r3-label">structure:</span>
+    <div class="r3-group">
+      <button onmousedown="wrapHeading(event); return false;" class="mu-btn mu-struct"
+              title="Heading — standalone title on its own line: {h:text} · no selection = whole line">H</button>
+      <button onmousedown="wrapLabel(event); return false;" class="mu-btn mu-struct"
+              title="Label — number/title opening a paragraph: {lab:text}">L</button>
+      <button onmousedown="wrapMargin(event); return false;" class="mu-btn mu-margin"
+              title="Margin note: [margin: text] — start of line = left margin, end of line = right · no selection = empty [margin: ] to type into">M</button>
+      <button onmousedown="wrapAddedLine(event); return false;" class="mu-btn mu-struct"
+              title="Added line — whole line added (no caret); the crossed-out line stays on its own row: {al:text} · no selection = whole line">AL</button>
     </div>
 
     <div class="r3-sep-wide"></div>
@@ -1868,7 +1895,10 @@
         <div class="help-row"><span class="help-key">$&hellip;$</span><span class="help-desc">inline LaTeX</span></div>
         <div class="help-row"><span class="help-key">ab</span><span class="help-desc">abbreviation + expansion</span></div>
         <div class="help-row"><span class="help-key">DL</span><span class="help-desc">data layer flag</span></div>
-        <div class="help-row"><span class="help-key">M</span><span class="help-desc">marginal addition</span></div>
+        <div class="help-row"><span class="help-key">H &nbsp;L</span><span class="help-desc">heading {h:} · paragraph label {lab:}</span></div>
+        <div class="help-row"><span class="help-key">M</span><span class="help-desc">[margin: …] — start of line = left, end = right</span></div>
+        <div class="help-row"><span class="help-key">AL</span><span class="help-desc">whole added line {al:}</span></div>
+        <div class="help-row"><span class="help-key">cw</span><span class="help-desc">catchword {cw:} (Extra Markup)</span></div>
         <div class="help-row"><span class="help-key" style="text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:3px;">u</span><span class="help-desc">underlined in manuscript</span></div>
         <div class="help-row"><span class="help-key">ov</span><span class="help-desc">overwrite {ov:new|old} — old optional</span></div>
         <div class="help-row"><span class="help-key">in</span><span class="help-desc">inline insertion at baseline</span></div>
@@ -3849,6 +3879,16 @@ function convertHTMLToMarkup(htmlString) {
                     result += '{nadd:' + convertElement(node) + '}';
                 } else if (node.classList.contains('markup-supp')) {
                     result += '{supp:' + convertElement(node) + '}';
+                } else if (node.classList.contains('markup-marginb')) {
+                    result += '[margin: ' + convertElement(node) + ']';
+                } else if (node.classList.contains('markup-head')) {
+                    result += '{h:' + convertElement(node) + '}';
+                } else if (node.classList.contains('markup-lab')) {
+                    result += '{lab:' + convertElement(node) + '}';
+                } else if (node.classList.contains('markup-al')) {
+                    result += '{al:' + convertElement(node) + '}';
+                } else if (node.classList.contains('markup-cw')) {
+                    result += '{cw:' + convertElement(node) + '}';
                 } else if (node.classList.contains('markup-variable')) {
                     result += '{v:' + convertElement(node) + '}';
                 } else if (node.classList.contains('markup-point')) {
@@ -4207,18 +4247,7 @@ function exportMarkdown(dest) {
             let corrected = '';
             
             // If cell has been rendered with markup, extract original from innerHTML
-            if (correctedCell.innerHTML.includes('markup-deleted') || 
-                correctedCell.innerHTML.includes('markup-added') ||
-                correctedCell.innerHTML.includes('markup-unclear') ||
-                correctedCell.innerHTML.includes('markup-datalayer') ||
-                correctedCell.innerHTML.includes('markup-overwrite') ||
-                correctedCell.innerHTML.includes('markup-inline') ||
-                correctedCell.innerHTML.includes('markup-margin') ||
-                correctedCell.innerHTML.includes('markup-underline') ||
-                correctedCell.innerHTML.includes('markup-variable') ||
-                correctedCell.innerHTML.includes('markup-point') ||
-                correctedCell.innerHTML.includes('markup-line') ||
-                correctedCell.innerHTML.includes('markup-figure')) {
+            if (correctedCell.querySelector('[class*="markup-"]')) {   // v1.27: any rendered markup
                 // Has rendered markup - need to convert back
                 
                 function convertMarkupToText(element) {
@@ -4250,6 +4279,24 @@ function exportMarkdown(dest) {
                                 result += '{M:' + inner + '}';
                             } else if (node.classList.contains('markup-underline')) {
                                 result += '{u:' + node.textContent + '}';
+                            } else if (node.classList.contains('markup-bold')) {
+                                result += '{b:' + convertMarkupToText(node) + '}';
+                            } else if (node.classList.contains('markup-hc')) {
+                                result += '{hc:' + convertMarkupToText(node) + '}';
+                            } else if (node.classList.contains('markup-nadd')) {
+                                result += '{nadd:' + convertMarkupToText(node) + '}';
+                            } else if (node.classList.contains('markup-supp')) {
+                                result += '{supp:' + convertMarkupToText(node) + '}';
+                            } else if (node.classList.contains('markup-marginb')) {
+                                result += '[margin: ' + convertMarkupToText(node) + ']';
+                            } else if (node.classList.contains('markup-head')) {
+                                result += '{h:' + convertMarkupToText(node) + '}';
+                            } else if (node.classList.contains('markup-lab')) {
+                                result += '{lab:' + convertMarkupToText(node) + '}';
+                            } else if (node.classList.contains('markup-al')) {
+                                result += '{al:' + convertMarkupToText(node) + '}';
+                            } else if (node.classList.contains('markup-cw')) {
+                                result += '{cw:' + convertMarkupToText(node) + '}';
                             } else if (node.classList.contains('markup-variable')) {
                                 result += '{v:' + convertMarkupToText(node) + '}';
                             } else if (node.classList.contains('markup-point')) {
@@ -4643,6 +4690,30 @@ function renderMarkup(cell) {
     html = html.replace(/\{p:([^}]+)\}/g, '<span class="markup-point">$1</span>');
     html = html.replace(/\{l:([^}]+)\}/g, '<span class="markup-line">$1</span>');
     html = html.replace(/\{f:([^}]+)\}/g, '<span class="markup-figure">$1</span>');
+
+    // v1.27 batch B — structural markup, applied last so inner markup is already rendered
+    html = html.replace(/\{cw:([^}]+)\}/g,  '<span class="markup-cw" title="catchword">$1</span>');
+    html = html.replace(/\{lab:([^}]+)\}/g, '<span class="markup-lab" title="label">$1</span>');
+    html = html.replace(/\{h:([^}]+)\}/g,   '<span class="markup-head" title="heading">$1</span>');
+    html = html.replace(/\{al:([^}]+)\}/g,  '<span class="markup-al" title="added line">$1</span>');
+    // [margin: …] — matched with bracket counting, so [ue]-style expansions inside work
+    html = (function(h) {
+        let out = '', i = 0;
+        while (true) {
+            const k = h.indexOf('[margin:', i);
+            if (k < 0) { out += h.slice(i); break; }
+            let depth = 0, j = k;
+            for (; j < h.length; j++) {
+                if (h[j] === '[') depth++;
+                else if (h[j] === ']') { depth--; if (depth === 0) break; }
+            }
+            if (j >= h.length) { out += h.slice(i); break; }     // unclosed: leave as typed
+            out += h.slice(i, k) + '<span class="markup-marginb" title="margin note">' +
+                   h.slice(k + 8, j).replace(/^ /, '') + '</span>';
+            i = j + 1;
+        }
+        return out;
+    })(html);
 
     // Restore protected LaTeX spans as plain (HTML-escaped) text
     html = html.replace(/\u0000M(\d+)\u0000/g, function(_, i) {
@@ -5583,9 +5654,47 @@ function wrapDataLayer(event) {
     wrapSelectionWith('{DL:', '}', 'Data layer flag');
 }
 
+// v1.27 batch B — structure buttons
+// Wrap the selection; with nothing selected, either wrap the whole line
+// (H, AL) or insert an empty marker to type into (M).
+function _structWrap(prefix, suffix, type, emptyMode) {
+    const sel = window.getSelection();
+    if (sel && sel.toString().trim()) return wrapSelectionWith(prefix, suffix, type);
+    const cell = document.activeElement;
+    if (!cell || !cell.classList || !cell.classList.contains('editable')) {
+        showStatus('Click in a Corrected Text cell first', 'error'); return;
+    }
+    if (!cell.classList.contains('col-corrected')) {
+        showStatus('Markup can only be applied in the Corrected Text column', 'error'); return;
+    }
+    if (emptyMode === 'whole') {
+        const t = cell.textContent.trim();
+        if (!t) { showStatus('This line is empty', 'error'); return; }
+        const r = document.createRange();
+        r.selectNodeContents(cell);
+        sel.removeAllRanges(); sel.addRange(r);
+        document.execCommand('insertText', false, prefix + t + suffix);
+        showStatus(type + ' marked (whole line)', 'success');
+    } else if (emptyMode === 'insert') {
+        // add separating spaces if the marker would touch neighbouring text
+        const off = _getCaretOffsets(cell), txt = cell.textContent;
+        const before = off && off.start > 0 && !/\s/.test(txt[off.start - 1]) ? ' ' : '';
+        const after  = off && off.end < txt.length && !/\s/.test(txt[off.end]) ? ' ' : '';
+        document.execCommand('insertText', false, before + prefix + suffix + after);
+        const back = suffix.length + after.length;
+        if (sel.modify) for (let i = 0; i < back; i++) sel.modify('move', 'backward', 'character');
+        showStatus(type + ' inserted — type the text', 'success');
+    } else {
+        showStatus('Select text first', 'error');
+    }
+}
+function wrapHeading(event)   { if (event) event.preventDefault(); _structWrap('{h:', '}', 'Heading', 'whole'); }
+function wrapLabel(event)     { if (event) event.preventDefault(); _structWrap('{lab:', '}', 'Label', null); }
+function wrapAddedLine(event) { if (event) event.preventDefault(); _structWrap('{al:', '}', 'Added line', 'whole'); }
+function wrapCatchword(event) { if (event) event.preventDefault(); _structWrap('{cw:', '}', 'Catchword', null); }
 function wrapMargin(event) {
-    event.preventDefault();
-    wrapSelectionWith('{M:', '}', 'Margin addition');
+    if (event) event.preventDefault();
+    _structWrap('[margin: ', ']', 'Margin note', 'insert');
 }
 
 function wrapUnderline(event) {
