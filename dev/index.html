@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>[DEV] Newt — Newton Manuscript Correction Interface v1.27-dev2</title>
+    <title>[DEV] Newt — Newton Manuscript Correction Interface v1.27-dev4</title>
 
-    <!-- Newt v1.27-dev2 — see CHANGELOG.md -->
+    <!-- Newt v1.27-dev4 — see CHANGELOG.md -->
 
     <!-- Cache-control hints for GitHub Pages, which doesn't allow setting real
          HTTP cache headers. Meta tags are honoured inconsistently across
@@ -1585,7 +1585,7 @@
 <div id="newtDevBadge" style="position:fixed; left:10px; bottom:10px; z-index:99999;
      background:#C0392B; color:#fff; font:bold 12px/1 system-ui,sans-serif;
      padding:6px 10px; border-radius:4px; box-shadow:0 1px 4px rgba(0,0,0,.3);
-     pointer-events:none; letter-spacing:.04em;">DEV BUILD v1.27-dev2 — test version</div>
+     pointer-events:none; letter-spacing:.04em;">DEV BUILD v1.27-dev4 — test version</div>
 <!-- ── END DEV BUILD BADGE ── -->
 
 <!-- ── Migration banner (v29a) ────────────────────────────────────────
@@ -2296,6 +2296,54 @@ let selectedCells = [];
 let savedRange = null;
 let savedCell = null;
 
+// v1.27: cursor position saved as character offsets in the cell's raw text.
+// A saved Range does not survive the Corrected cell being re-rendered on blur
+// (opening the symbol picker blurs the cell, which replaces its contents), and
+// re-focusing the cell moves the cursor to the end — so symbols were always
+// inserted at the end of the line. Offsets survive both.
+let savedOffsets = null;   // { cell, start, end, len }
+
+function _getCaretOffsets(cell) {
+    const sel = window.getSelection();
+    if (!cell || sel.rangeCount === 0) return null;
+    const r = sel.getRangeAt(0);
+    if (!cell.contains(r.startContainer) || !cell.contains(r.endContainer)) return null;
+    const pre = document.createRange();
+    pre.selectNodeContents(cell);
+    pre.setEnd(r.startContainer, r.startOffset);
+    const start = pre.toString().length;
+    pre.setEnd(r.endContainer, r.endOffset);
+    const end = pre.toString().length;
+    return { cell: cell, start: start, end: end, len: cell.textContent.length };
+}
+
+function _setCaretOffsets(cell, start, end) {
+    function locate(target) {
+        const walker = document.createTreeWalker(cell, NodeFilter.SHOW_TEXT);
+        let pos = 0, node, last = null;
+        while ((node = walker.nextNode())) {
+            const n = node.textContent.length;
+            if (target <= pos + n) return { node: node, offset: target - pos };
+            pos += n; last = node;
+        }
+        return last ? { node: last, offset: last.textContent.length } : { node: cell, offset: 0 };
+    }
+    const a = locate(start), b = locate(end);
+    const range = document.createRange();
+    range.setStart(a.node, a.offset);
+    range.setEnd(b.node, b.offset);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+}
+
+function _rememberCaret(target) {
+    const cell = target && target.closest ? target.closest('.editable') : null;
+    if (!cell) return;
+    const off = _getCaretOffsets(cell);
+    if (off) savedOffsets = off;
+}
+
 // Track focused cell and save cursor position
 document.addEventListener('focus', function(e) {
     if (e.target.classList.contains('editable')) {
@@ -2311,6 +2359,7 @@ document.addEventListener('focus', function(e) {
 
 // Update savedRange when user types or moves cursor
 document.addEventListener('keyup', function(e) {
+    _rememberCaret(e.target);
     if (e.target.classList.contains('editable')) {
         savedCell = e.target;
         const selection = window.getSelection();
@@ -2322,6 +2371,7 @@ document.addEventListener('keyup', function(e) {
 
 // Update savedRange when user clicks within a cell
 document.addEventListener('click', function(e) {
+    _rememberCaret(e.target);
     if (e.target.classList.contains('editable')) {
         savedCell = e.target;
         const selection = window.getSelection();
@@ -5370,6 +5420,7 @@ function showSymbolPicker() {
     const activeElement = document.activeElement;
     if (activeElement && activeElement.classList.contains('editable')) {
         savedCell = activeElement;
+        _rememberCaret(activeElement);
     }
     
     const selection = window.getSelection();
@@ -5397,12 +5448,18 @@ function insertSymbol(symbol) {
         return;
     }
     
+    // Keep the offsets before focus() — the focus handler moves the cursor to the end
+    const off = savedOffsets;
+
     // Restore focus to the cell
     savedCell.focus();
     
     // Restore the saved cursor position if we have one
     const selection = window.getSelection();
-    if (savedRange) {
+    if (off && off.cell === savedCell && savedCell.textContent.length === off.len) {
+        // v1.27: exact position from saved offsets
+        _setCaretOffsets(savedCell, off.start, off.end);
+    } else if (savedRange) {
         try {
             selection.removeAllRanges();
             selection.addRange(savedRange);
@@ -5425,6 +5482,8 @@ function insertSymbol(symbol) {
     if (selection.rangeCount > 0) {
         savedRange = selection.getRangeAt(0).cloneRange();
     }
+    // ...and the offsets, so several symbols in a row go in one after another
+    _rememberCaret(savedCell);
 }
 
 
@@ -6152,7 +6211,8 @@ function newProjectFlow() {
     var sn = (typeof suggestShortName === 'function') ? suggestShortName(name) : name.slice(0, 12);
     var newEntry = { id: id, name: name, shortName: sn, colour: colour,
         storagePrefix: 'newt_' + id + '_',
-        features: { katex: false, geneticEncoding: false, clusterAssignment: false,
+        // v1.27: LaTeX on by default for new projects (switch off in Settings → Features)
+        features: { katex: true, geneticEncoding: false, clusterAssignment: false,
                     propositionMapping: false },
         workflow: { unitType: 'folio', inputMethod: 'htr',
                     colLeft: 'HTR Output', colRight: 'Corrected Text' },
@@ -7292,6 +7352,13 @@ function toggleFeature(toggleEl) {
     var cfg   = getActiveProject();
     if (!cfg.features) cfg.features = {};
     cfg.features[feat] = nowOn;
+    // v1.27: save the switch straight away, as the Features tab promises
+    // ("Changes take effect immediately") — previously it was only kept if
+    // the Settings panel was closed with Save.
+    if (typeof updateRegistryEntry === 'function') {
+        updateRegistryEntry(ACTIVE_PROJECT_ID, { features: cfg.features });
+    }
+    saveProjectConfig();
     applyFeatureFlags();
     if (feat === 'geneticEncoding' && !nowOn && genColumnVisible) toggleGeneticPill();
 }
