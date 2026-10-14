@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>[DEV] Newt — Newton Manuscript Correction Interface v1.27-dev9</title>
+    <title>[DEV] Newt — Newton Manuscript Correction Interface v1.27-dev10</title>
 
-    <!-- Newt v1.27-dev9 — see CHANGELOG.md -->
+    <!-- Newt v1.27-dev10 — see CHANGELOG.md -->
 
     <!-- Cache-control hints for GitHub Pages, which doesn't allow setting real
          HTTP cache headers. Meta tags are honoured inconsistently across
@@ -1248,18 +1248,20 @@
         .mu-struct { border-color: #607D8B; color: #37474F; font-weight: 600; }
         /* v1.27 batch D — tier, timer, page breaks */
         .tier-select { font-size: 11px; padding: 3px 4px; border: 1px solid #ccc; border-radius: 4px;
-                       background: #fff; color: #555; cursor: pointer; font-family: inherit; }
-        .tier-select.t1 { background: #2196F3; border-color: #1976D2; color: #fff; }
-        .tier-select.t2 { background: #4CAF50; border-color: #388E3C; color: #fff; }
-        .tier-select.t3 { background: #FFEB3B; border-color: #FBC02D; color: #333; }
-        .tier-select.t4 { background: #FF9800; border-color: #F57C00; color: #fff; }
-        .tier-select.t5 { background: #F44336; border-color: #D32F2F; color: #fff; }
-        .tier-select option { background: #fff; color: #333; }
-        .tier-select option[value="1"] { background: #2196F3; color: #fff; }
-        .tier-select option[value="2"] { background: #4CAF50; color: #fff; }
-        .tier-select option[value="3"] { background: #FFEB3B; color: #333; }
-        .tier-select option[value="4"] { background: #FF9800; color: #fff; }
-        .tier-select option[value="5"] { background: #F44336; color: #fff; }
+                       background: #fff; color: #555; cursor: pointer; font-family: inherit; font-weight: 700; }
+        /* v1.27: muted tints + strong border, bold dark text for readability */
+        .tier-select.t1 { background: #DCEAF8; border: 2px solid #2196F3; color: #0D47A1; }
+        .tier-select.t2 { background: #DFF0DF; border: 2px solid #4CAF50; color: #1B5E20; }
+        .tier-select.t3 { background: #FBF3C4; border: 2px solid #E2C800; color: #5D4E00; }
+        .tier-select.t4 { background: #FCE6CC; border: 2px solid #FF9800; color: #8A4B00; }
+        .tier-select.t5 { background: #F9DAD7; border: 2px solid #F44336; color: #8E1B12; }
+        .tier-select option { background: #fff; color: #333; font-weight: 700; }
+        .tier-select option[value="1"] { background: #DCEAF8; color: #0D47A1; }
+        .tier-select option[value="2"] { background: #DFF0DF; color: #1B5E20; }
+        .tier-select option[value="3"] { background: #FBF3C4; color: #5D4E00; }
+        .tier-select option[value="4"] { background: #FCE6CC; color: #8A4B00; }
+        .tier-select option[value="5"] { background: #F9DAD7; color: #8E1B12; }
+        .r1-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
         .timer-wrap { display: inline-flex; align-items: center; gap: 3px; border: 1px solid #ccc;
                       border-radius: 4px; padding: 1px 4px; background: #fff; }
         .timer-wrap.running { border-color: #4CAF50; background: #F1F8E9; }
@@ -1640,7 +1642,7 @@
 <div id="newtDevBadge" style="position:fixed; left:10px; bottom:10px; z-index:99999;
      background:#C0392B; color:#fff; font:bold 12px/1 system-ui,sans-serif;
      padding:6px 10px; border-radius:4px; box-shadow:0 1px 4px rgba(0,0,0,.3);
-     pointer-events:none; letter-spacing:.04em;">DEV BUILD v1.27-dev9 — test version</div>
+     pointer-events:none; letter-spacing:.04em;">DEV BUILD v1.27-dev10 — test version</div>
 <!-- ── END DEV BUILD BADGE ── -->
 
 <!-- ── Migration banner (v29a) ────────────────────────────────────────
@@ -1735,11 +1737,6 @@
               title="Assign or view cluster for this folio" style="font-size:11px; padding:4px 8px;">
         🔗 <span id="clusterBadgeLabel">+ Cluster</span>
       </button>
-      <span id="timerWrap" class="timer-wrap" style="display:none" title="Time spent on this unit (Settings → Features → Timer)">
-        <button id="timerBtn" class="timer-btn" onclick="toggleTimer()" title="Start / pause timer for this unit">▶</button>
-        <span id="timerDisplay" class="timer-display">0:00</span>
-        <button class="timer-reset" onclick="resetTimer()" title="Reset this unit's timer">↺</button>
-      </span>
     </div>
 
     <div class="r1-sep"></div>
@@ -1754,10 +1751,17 @@
 
     <div class="r1-sep"></div>
 
-    <!-- Settings (placeholder for v1.0) -->
-    <button class="t-settings"
-            onclick="openSettings()"
-            title="Project settings">⚙ Settings</button>
+    <!-- v1.27: timer (optional) + Settings, kept together at the right -->
+    <div class="r1-right">
+        <span id="timerWrap" class="timer-wrap" style="display:none" title="Time spent on this unit (Settings → Features → Timer)">
+          <button id="timerBtn" class="timer-btn" onclick="toggleTimer()" title="Start / pause timer for this unit">▶</button>
+          <span id="timerDisplay" class="timer-display">0:00</span>
+          <button class="timer-reset" onclick="resetTimer()" title="Reset this unit's timer">↺</button>
+        </span>
+      <button class="t-settings"
+              onclick="openSettings()"
+              title="Project settings">⚙ Settings</button>
+    </div>
 
   </div><!-- /r1 -->
 
@@ -2407,6 +2411,7 @@
 // before populateFolioDropdown() and initializeTable() run at parse time.
 // Default value; overwritten at runtime by the project selector.
 var STORAGE_PREFIX = 'newt_ms_add_3965_';
+var NEWT_VERSION = 'newt_v1_27';   // v1.27: stamped into config/backup exports
 
 // Global state
 let cvColumnVisible = false; // Default to hidden
@@ -4443,14 +4448,14 @@ function exportMarkdown(dest) {
         const today = new Date().toLocaleDateString('en-GB', {day:'2-digit', month:'2-digit', year:'numeric'});
         output += `---\n\n`;
         output += `[REVIEW — ${folioId} — ${today}]\n\n`;
-        output += `GEMINI SUMMARY ASSESSMENT:\n`;
+        output += `AI SUMMARY ASSESSMENT:\n`;
         output += `- Low confidence flags: [correct / false positive / missed — note which lines]\n`;
         output += `- Illegible flags: [correct / false positive / missed — note which lines]\n`;
         output += `- HAND? flags correct: [N/total — list lines]\n`;
         output += `- HAND? false positives: [list lines]\n`;
         output += `- HAND? missed: [list lines]\n\n`;
         output += `TRANSCRIPTION ERRORS:\n`;
-        output += `- [Line N: Gemini "X" → correct "Y" — TYPE: high-frequency substitution / complex revision zone / markup failure / non-Latin normalisation / other]\n\n`;
+        output += `- [Line N: AI "X" → correct "Y" — TYPE: high-frequency substitution / complex revision zone / markup failure / non-Latin normalisation / other]\n\n`;
         output += `HAND ATTRIBUTION DECISIONS:\n`;
         output += `- [Line N, text: attribution (high/medium/low confidence) — evidence]\n\n`;
         output += `SCHOLARLY NOTES:\n`;
@@ -4487,9 +4492,9 @@ function exportHTR(dest, format) {
         let lineCount = 0;
 
         if (format === 'md') {
-            output = '# Folio ' + folioId + ' - HTR Output (Gemini, uncorrected)\n\n';
+            output = '# Folio ' + folioId + ' - HTR Output (AI, uncorrected)\n\n';
             output += '**Generated:** ' + new Date().toLocaleString() + '\n';
-            output += '**Purpose:** Comparison with corrected MD — for Gemini error tracking and hand attribution review\n\n';
+            output += '**Purpose:** Comparison with corrected MD — for AI error tracking and hand attribution review\n\n';
             output += '---\n\n';
 
             for (let i = 0; i < tbody.rows.length; i++) {
@@ -4508,11 +4513,12 @@ function exportHTR(dest, format) {
                 output += '---\n\n';
                 output += '[HTR EXPORT — ' + folioId + ' — ' + new Date().toLocaleDateString('en-GB', {day:'2-digit', month:'2-digit', year:'numeric'}) + ']\n';
                 output += 'Lines exported: ' + lineCount + '\n';
-                output += 'Compare with: corrected_' + folioId + '.md\n';
+                var _epfxC = (getActiveProject().shortName || '').replace(/[^a-z0-9]/gi,'_').replace(/_+/g,'_');
+                output += 'Compare with: ' + (_epfxC ? _epfxC + '_' : '') + 'corrected_' + folioId + '.md\n';
             }
         } else {
             // Plain text - simpler, no markdown syntax
-            output = 'Folio ' + folioId + ' - HTR Output (Gemini, uncorrected, plain text)\n';
+            output = 'Folio ' + folioId + ' - HTR Output (AI, uncorrected, plain text)\n';
             output += 'Generated: ' + new Date().toLocaleString() + '\n\n';
 
             for (let i = 0; i < tbody.rows.length; i++) {
@@ -4529,7 +4535,7 @@ function exportHTR(dest, format) {
         }
 
         if (lineCount === 0) {
-            showStatus('No HTR content to export — paste Gemini output first.', 'error');
+            showStatus('No HTR content to export — paste the AI/HTR output first.', 'error');
             return;
         }
 
@@ -4571,20 +4577,15 @@ function exportTEI(dest) {
         if (correctedCell.textContent.trim()) {
             // Add note as XML comment before the line
             if (notes) {
-                xml += '          <!-- LINE ' + lineNum + ' NOTE: ' + notes + ' -->\n';
+                xml += '          <!-- LINE ' + lineNum + ' NOTE: ' + notes.replace(/--/g, '- -') + ' -->\n';
             }
             
             xml += '          <lb n="' + lineNum + '"/>';
             
-            // Check for math containers
-            const mathContainers = correctedCell.querySelectorAll('.math-container');
-            if (mathContainers.length > 0) {
-                // Has math - need to process
-                xml += correctedCell.textContent.trim();
-                xml += ' [MATH: LaTeX conversion needed]';
-            } else {
-                xml += correctedCell.textContent.trim();
-            }
+            // v1.27: export the markup exactly as typed (~~del~~, ^add^, {…}, $…$),
+            // XML-escaped — previously the displayed text was exported, which
+            // silently dropped all deletion/addition markup.
+            xml += _xmlEsc(_rawCellMarkup(correctedCell).trim());
             xml += '\n';
         }
     }
@@ -4595,7 +4596,8 @@ function exportTEI(dest) {
     xml += '  </text>\n';
     xml += '</TEI>';
     
-    var _fnameTei = 'tei_' + folioId + '.xml';
+    var _epfxTei = (getActiveProject().shortName || '').replace(/[^a-z0-9]/gi,'_').replace(/_+/g,'_');
+    var _fnameTei = (_epfxTei ? _epfxTei + '_' : '') + 'tei_' + folioId + '.xml';
     if (dest === 'drive') { _uploadTextToDrive(xml, _fnameTei, 'TEI XML saved to Drive'); }
     else { downloadFile(xml, _fnameTei); showStatus('Basic TEI XML exported. Paste into Claude for proper conversion with notes.', 'success'); }
 }
@@ -5700,6 +5702,17 @@ function insertSymbol(symbol) {
     _rememberCaret(savedCell);
 }
 
+
+// v1.27: raw markup of a Corrected cell, whether it is being edited or rendered
+function _rawCellMarkup(cell) {
+    if (!cell) return '';
+    if (document.activeElement === cell) return cell.textContent || '';
+    if (cell.dataset.originalMarkup !== undefined) return cell.dataset.originalMarkup;
+    return cell.textContent || '';
+}
+function _xmlEsc(t) {
+    return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
 
 // ═══════════════════════════════════════════════════════════════════
 // v1.27 batch D — per-unit tier and timer
@@ -7518,9 +7531,11 @@ function _doImportOptica(data) {
         });
 
         try {
-            localStorage.setItem(prefix + unit.id, JSON.stringify({
-                folio: unit.id, timestamp: ts, data: rows
-            }));
+            var _rec = { folio: unit.id, timestamp: ts, data: rows };
+            ['tier', 'timeSeconds', 'cluster', 'clusterCert', 'proposedGrouping'].forEach(function(f) {
+                if (unit[f] !== undefined) _rec[f] = unit[f];   // v1.27
+            });
+            localStorage.setItem(prefix + unit.id, JSON.stringify(_rec));
             stored++;
         } catch(err) {
             console.warn('Could not store unit', unit.id, err);
@@ -8036,14 +8051,23 @@ function exportProjectMD() {
     var cfg = getActiveProject();
     // Build as array then join — avoids \n escaping issues
     var lines = ['# ' + (cfg.name || 'Project'), ''];
+    // v1.27: read the stored row format ({line, htr, corrected}); previously
+    // this read non-existent fields and exported headings only
+    var _strip = function(h) { var d = document.createElement('div'); d.innerHTML = h || ''; return d.textContent; };
     units.forEach(function(u) {
         lines.push('## ' + u.id, '');
-        if (u.data && u.data.rows) {
-            u.data.rows.forEach(function(row) {
-                var prefix = row.lineNum ? row.lineNum + '\t' : '';
-                lines.push(prefix + (row.correctedText || row.htrText || ''));
-            });
-        }
+        var d = u.data || {};
+        var meta = [];
+        if (d.tier) meta.push('Tier ' + d.tier);
+        if (d.timeSeconds) meta.push((d.timeSeconds / 60).toFixed(1) + ' min');
+        if (meta.length) lines.push('*' + meta.join(' · ') + '*', '');
+        (Array.isArray(d.data) ? d.data : []).forEach(function(row) {
+            var text = (row.corrected && row.corrected.trim()) ? row.corrected : _strip(row.htr);
+            if (!text || !text.trim()) return;
+            if (PB_RE.test(text)) { lines.push('', '[PAGE BREAK]', ''); return; }
+            var prefix = (row.line !== undefined && row.line !== '') ? row.line + '\t' : '';
+            lines.push(prefix + text);
+        });
         lines.push('', '---', '');
     });
     var md = lines.join('\n');
@@ -8053,7 +8077,7 @@ function exportProjectMD() {
 
 function exportProjectConfig() {
     var cfg = getActiveProject();
-    var out = { _note: 'Newt project config', _version: 'newt_v1_24',
+    var out = { _note: 'Newt project config', _version: NEWT_VERSION,
         id: cfg.id, name: cfg.name, shortName: cfg.shortName, colour: cfg.colour,
         shelfmark: cfg.shelfmark, repository: cfg.repository, language: cfg.language,
         dateRange: cfg.dateRange, iiifUrl: cfg.iiifUrl,
@@ -8064,7 +8088,7 @@ function exportProjectConfig() {
 }
 
 function _buildFullBackupObject() {
-    var backup = { _note: 'Newt full backup', _version: 'newt_v1_24',
+    var backup = { _note: 'Newt full backup', _version: NEWT_VERSION,
         exported: new Date().toISOString(), data: {} };
     for (var i = 0; i < localStorage.length; i++) {
         var k = localStorage.key(i);
@@ -8495,7 +8519,12 @@ function exportSingleProjectJSON() {
 
         // Stored shape uses `data` for the row array; import format uses `rows`.
         var rows = Array.isArray(raw.data) ? raw.data : [];
-        units.push({ id: unitId, rows: rows });
+        // v1.27: carry per-unit tier, time and cluster info as well
+        var _u = { id: unitId, rows: rows };
+        ['tier', 'timeSeconds', 'cluster', 'clusterCert', 'proposedGrouping'].forEach(function(f) {
+            if (raw[f] !== undefined) _u[f] = raw[f];
+        });
+        units.push(_u);
     }
 
     if (units.length === 0) {
