@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>[DEV] Newt — Newton Manuscript Correction Interface v1.27-dev1</title>
+    <title>[DEV] Newt — Newton Manuscript Correction Interface v1.27-dev2</title>
 
-    <!-- Newt v1.27-dev1 — see CHANGELOG.md -->
+    <!-- Newt v1.27-dev2 — see CHANGELOG.md -->
 
     <!-- Cache-control hints for GitHub Pages, which doesn't allow setting real
          HTTP cache headers. Meta tags are honoured inconsistently across
@@ -1585,7 +1585,7 @@
 <div id="newtDevBadge" style="position:fixed; left:10px; bottom:10px; z-index:99999;
      background:#C0392B; color:#fff; font:bold 12px/1 system-ui,sans-serif;
      padding:6px 10px; border-radius:4px; box-shadow:0 1px 4px rgba(0,0,0,.3);
-     pointer-events:none; letter-spacing:.04em;">DEV BUILD v1.27-dev1 — test version</div>
+     pointer-events:none; letter-spacing:.04em;">DEV BUILD v1.27-dev2 — test version</div>
 <!-- ── END DEV BUILD BADGE ── -->
 
 <!-- ── Migration banner (v29a) ────────────────────────────────────────
@@ -4499,7 +4499,18 @@ function renderMarkup(cell) {
     cell.dataset.originalMarkup = originalText;
     
     let html = originalText;
-    
+
+    // v1.27: protect LaTeX spans ($...$ and $$...$$) before any markup is
+    // rendered, so a ^ inside math (e.g. $QT^q$) is never paired with a ^ of
+    // the ^addition^ markup. Math is shown as plain text here; rendered LaTeX
+    // stays in the LaTeX pill. A whole formula inside ~~ ~~ or ^ ^ still
+    // renders as deleted/added, since its placeholder sits inside the markup.
+    const _mathSpans = [];
+    html = html.replace(/\$\$[\s\S]*?\$\$|\$[^$\n]+\$/g, function(m) {
+        _mathSpans.push(m);
+        return '\u0000M' + (_mathSpans.length - 1) + '\u0000';
+    });
+
     // Render ~~deleted~~ as strikethrough
     html = html.replace(/~~([^~]+)~~/g, '<span class="markup-deleted">$1</span>');
     
@@ -4526,7 +4537,12 @@ function renderMarkup(cell) {
     html = html.replace(/\{p:([^}]+)\}/g, '<span class="markup-point">$1</span>');
     html = html.replace(/\{l:([^}]+)\}/g, '<span class="markup-line">$1</span>');
     html = html.replace(/\{f:([^}]+)\}/g, '<span class="markup-figure">$1</span>');
-    
+
+    // Restore protected LaTeX spans as plain (HTML-escaped) text
+    html = html.replace(/\u0000M(\d+)\u0000/g, function(_, i) {
+        return _mathSpans[+i].replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    });
+
     cell.innerHTML = html;
 }
 
