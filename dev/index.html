@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>[DEV] Newt — Newton Manuscript Correction Interface v1.27-dev7</title>
+    <title>[DEV] Newt — Newton Manuscript Correction Interface v1.27-dev8</title>
 
-    <!-- Newt v1.27-dev7 — see CHANGELOG.md -->
+    <!-- Newt v1.27-dev8 — see CHANGELOG.md -->
 
     <!-- Cache-control hints for GitHub Pages, which doesn't allow setting real
          HTTP cache headers. Meta tags are honoured inconsistently across
@@ -243,6 +243,7 @@
         .markup-head::before { content: "H"; }
         .markup-head { font-weight: 600; }
         .markup-lab::before  { content: "L"; }
+        .markup-lab { font-weight: 600; }
         .markup-al::before   { content: "AL"; }
         .markup-al { border-left: 2px solid #607D8B; padding-left: 3px; }
         .markup-cw::before   { content: "cw"; }
@@ -1616,7 +1617,7 @@
 <div id="newtDevBadge" style="position:fixed; left:10px; bottom:10px; z-index:99999;
      background:#C0392B; color:#fff; font:bold 12px/1 system-ui,sans-serif;
      padding:6px 10px; border-radius:4px; box-shadow:0 1px 4px rgba(0,0,0,.3);
-     pointer-events:none; letter-spacing:.04em;">DEV BUILD v1.27-dev7 — test version</div>
+     pointer-events:none; letter-spacing:.04em;">DEV BUILD v1.27-dev8 — test version</div>
 <!-- ── END DEV BUILD BADGE ── -->
 
 <!-- ── Migration banner (v29a) ────────────────────────────────────────
@@ -1776,7 +1777,7 @@
               title="Addition inside an addition: {nadd:text} — use inside ^…^">nadd</button>
       <button onmousedown="wrapSupplied(event); return false;" class="mu-btn mu-supp"
               title="Supplied — letters not visible on the page (gutter, damage): {supp:text}">supp</button>
-      <button onmousedown="wrapCatchword(event); return false;" class="mu-btn mu-struct"
+      <button onmousedown="wrapCatchword(event); return false;" class="mu-btn"
               title="Catchword: {cw:text}">cw</button>
     </div>
   </div><!-- /r2 -->
@@ -2323,7 +2324,7 @@
                 <button class="symbol-btn" onclick="insertSymbol('☍')" title="Opposition">☍</button>
             </div>
             
-            <h4 style="margin: 15px 0 5px 0; font-size: 12px; color: #666;">Mathematical & Other</h4>
+            <h4 style="margin: 15px 0 5px 0; font-size: 12px; color: #666;">Mathematical</h4>
             <div class="symbol-grid">
                 <button class="symbol-btn" onclick="insertSymbol('°')">°</button>
                 <button class="symbol-btn" onclick="insertSymbol('′')" title="Prime (arcminutes)">′</button>
@@ -2341,7 +2342,19 @@
                 <button class="symbol-btn" onclick="insertSymbol('∑')">∑</button>
                 <button class="symbol-btn" onclick="insertSymbol('∴')" title="Therefore">∴</button>
                 <button class="symbol-btn" onclick="insertSymbol('∵')" title="Because">∵</button>
-                <button class="symbol-btn" onclick="insertSymbol('¬')" title="Line end marker (¬)">¬</button>
+            </div>
+
+            <h4 style="margin: 15px 0 5px 0; font-size: 12px; color: #666;">Other Signs</h4>
+            <div class="symbol-grid">
+                <button class="symbol-btn" onclick="insertSymbol('¬')" title="Line-end hyphen (word continues on next line)">¬</button>
+                <button class="symbol-btn" onclick="insertSymbol('‸')" title="Caret — visible insertion mark: ‸ (place before the ^addition^)">‸</button>
+                <button class="symbol-btn" onclick="insertSymbol('{sign:double-x}')" title="Reference sign (signe de renvoi): two interlaced X's → {sign:double-x}">
+                    <svg width="18" height="18" viewBox="0 0 18 18" style="vertical-align:middle" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                        <line x1="3" y1="6" x2="12" y2="15"/><line x1="6" y1="3" x2="15" y2="12"/>
+                        <line x1="12" y1="3" x2="3" y2="12"/><line x1="15" y1="6" x2="6" y2="15"/>
+                    </svg></button>
+                <button class="symbol-btn" onclick="insertSignUnknown()" title="Unknown sign → {sign:unknown|} — describe it after the | (optional)"
+                        style="font-size:13px; font-weight:600; border-style:dashed;">?</button>
             </div>
         </div>
         <div style="margin-top: 15px; text-align: right;">
@@ -4654,7 +4667,7 @@ function renderMarkup(cell) {
     // stays in the LaTeX pill. A whole formula inside ~~ ~~ or ^ ^ still
     // renders as deleted/added, since its placeholder sits inside the markup.
     const _mathSpans = [];
-    html = html.replace(/\$\$[\s\S]*?\$\$|\$[^$\n]+\$/g, function(m) {
+    html = html.replace(/\$\$[\s\S]*?\$\$|\$[^$\n]+\$|\{sign:[^}]*\}/g, function(m) {
         _mathSpans.push(m);
         return '\u0000M' + (_mathSpans.length - 1) + '\u0000';
     });
@@ -5613,6 +5626,15 @@ function insertSymbol(symbol) {
     _rememberCaret(savedCell);
 }
 
+
+// v1.27 batch C — unknown sign: insert {sign:unknown|} and leave the cursor
+// after the |, so a description can be typed (or left empty)
+function insertSignUnknown() {
+    insertSymbol('{sign:unknown|}');
+    const sel = window.getSelection();
+    if (sel && sel.modify) sel.modify('move', 'backward', 'character');
+    if (savedCell) _rememberCaret(savedCell);
+}
 
 // Semantic markup functions
 function wrapVariable(event) {
