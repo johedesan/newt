@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>[DEV] Newt — Newton Manuscript Correction Interface v1.27-dev10</title>
+    <title>[DEV] Newt — Newton Manuscript Correction Interface v1.28-dev1</title>
 
-    <!-- Newt v1.27-dev10 — see CHANGELOG.md -->
+    <!-- Newt v1.28-dev1 — see CHANGELOG.md -->
 
     <!-- Cache-control hints for GitHub Pages, which doesn't allow setting real
          HTTP cache headers. Meta tags are honoured inconsistently across
@@ -1262,6 +1262,35 @@
         .tier-select option[value="4"] { background: #FCE6CC; color: #8A4B00; }
         .tier-select option[value="5"] { background: #F9DAD7; color: #8E1B12; }
         .r1-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+        /* v1.28 */
+        .pagenote-btn { font-size: 11px; padding: 3px 7px; border: 1px solid #ccc; border-radius: 4px; background: #fff; cursor: pointer; font-family: inherit; }
+        .pagenote-btn.has-note { border-color: #8E7CC3; background: #F1ECFA; font-weight: 600; }
+        .pn-modal { position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 100000; display: flex; align-items: center; justify-content: center; }
+        .pn-box { background: #fff; border-radius: 6px; padding: 14px 16px; width: min(560px, 92vw); box-shadow: 0 4px 20px rgba(0,0,0,.25); }
+        .pn-title { font-weight: 700; margin-bottom: 4px; }
+        .pn-desc { font-size: 11px; color: #666; margin-bottom: 8px; line-height: 1.4; }
+        .pn-box textarea { width: 100%; box-sizing: border-box; font: 13px/1.4 inherit; padding: 6px; border: 1px solid #ccc; border-radius: 4px; }
+        .pn-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+        .pn-actions button { padding: 5px 12px; border: 1px solid #ccc; border-radius: 4px; background: #fff; cursor: pointer; }
+        .pn-actions .pn-save { background: #4A6FA5; border-color: #4A6FA5; color: #fff; }
+        .mu-lay { border-color: #8D6E63; color: #5D4037; }
+        .lay-wrap { position: relative; display: inline-block; }
+        .lay-menu { display: none; position: absolute; top: 100%; left: 0; z-index: 1000; margin-top: 2px; background: #fff;
+                    border: 1px solid #8D6E63; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,.15); padding: 4px; }
+        .lay-menu.open { display: grid; }
+        .pos-grid.open { grid-template-columns: repeat(3, auto); gap: 3px; }
+        .sp-menu.open { grid-template-columns: auto auto auto auto; gap: 4px; align-items: center; white-space: nowrap; }
+        .lay-menu button { font-size: 11px; padding: 4px 6px; border: 1px solid #ddd; border-radius: 3px; background: #fafafa; cursor: pointer; }
+        .lay-menu button:hover { background: #EFEBE9; }
+        .sp-menu input { width: 42px; font-size: 11px; }
+        .sp-menu label { font-size: 11px; }
+        .markup-pos { font-size: 0.75em; color: #5D4037; background: #EFEBE9; border-radius: 2px; padding: 0 3px; }
+        .markup-pos::before { content: "⌖ "; }
+        .markup-space { font-size: 0.75em; color: #777; border: 1px dashed #aaa; border-radius: 2px; padding: 0 3px; }
+        .markup-space::before { content: "␣ "; }
+        .markup-mtop, .markup-mbottom { background: #F0E6FF; border-radius: 2px; color: #4A0080; }
+        .markup-mtop::before { content: "top: "; font-size: 0.8em; opacity: .7; }
+        .markup-mbottom::before { content: "bottom: "; font-size: 0.8em; opacity: .7; }
         .timer-wrap { display: inline-flex; align-items: center; gap: 3px; border: 1px solid #ccc;
                       border-radius: 4px; padding: 1px 4px; background: #fff; }
         .timer-wrap.running { border-color: #4CAF50; background: #F1F8E9; }
@@ -1638,11 +1667,24 @@
 </head>
 <body>
 
+<!-- v1.28: page note popup -->
+<div id="pageNoteModal" class="pn-modal" style="display:none">
+  <div class="pn-box">
+    <div class="pn-title">Page note — <span id="pageNoteUnit"></span></div>
+    <div class="pn-desc">A comment about the whole page. Saved with the unit, shown in the Corrected MD header and read by the XML agent. Not included in the public TEI.</div>
+    <textarea id="pageNoteText" rows="7"></textarea>
+    <div class="pn-actions">
+      <button onclick="closePageNote(false)">Cancel</button>
+      <button class="pn-save" onclick="closePageNote(true)">Save note</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── DEV BUILD BADGE (remove this block + "[DEV]" in <title> when promoting to stable) ── -->
 <div id="newtDevBadge" style="position:fixed; left:10px; bottom:10px; z-index:99999;
      background:#C0392B; color:#fff; font:bold 12px/1 system-ui,sans-serif;
      padding:6px 10px; border-radius:4px; box-shadow:0 1px 4px rgba(0,0,0,.3);
-     pointer-events:none; letter-spacing:.04em;">DEV BUILD v1.27-dev10 — test version</div>
+     pointer-events:none; letter-spacing:.04em;">DEV BUILD v1.28-dev1 — test version</div>
 <!-- ── END DEV BUILD BADGE ── -->
 
 <!-- ── Migration banner (v29a) ────────────────────────────────────────
@@ -1753,6 +1795,8 @@
 
     <!-- v1.27: timer (optional) + Settings, kept together at the right -->
     <div class="r1-right">
+        <button id="pageNoteBtn" class="pagenote-btn" onclick="openPageNote()" style="display:none"
+                title="Page note — a comment on the whole page (not exported to TEI; read by the XML agent)">📝 Page note</button>
         <span id="timerWrap" class="timer-wrap" style="display:none" title="Time spent on this unit (Settings → Features → Timer)">
           <button id="timerBtn" class="timer-btn" onclick="toggleTimer()" title="Start / pause timer for this unit">▶</button>
           <span id="timerDisplay" class="timer-display">0:00</span>
@@ -1791,6 +1835,10 @@
           <input type="checkbox" id="chkExtra" onchange="toggleExtraGroup(this.checked)">
           Extra Markup
         </label>
+        <label class="add-option">
+          <input type="checkbox" id="chkLayout" onchange="toggleLayoutGroup(this.checked)">
+          Layout
+        </label>
       </div>
     </div>
 
@@ -1820,6 +1868,41 @@
       <button onmousedown="wrapCatchword(event); return false;" class="mu-btn"
               title="Catchword: {cw:text}">cw</button>
     </div>
+
+    <!-- v1.28: Layout group -->
+    <div id="r2-layout-sep" class="r3-sep" style="display:none;"></div>
+    <span id="r2-layout-label" class="r3-label" style="display:none;">layout:</span>
+    <div id="r2-layout" class="r3-group" style="display:none;">
+      <span class="lay-wrap" id="posWrap">
+        <button onmousedown="togglePosMenu(); return false;" class="mu-btn mu-lay"
+                title="Position on the page of the block starting on this line: {pos:…} at the start of the line">Pos ▾</button>
+        <div class="lay-menu pos-grid" id="posMenu">
+          <button onmousedown="insertPos('top-left'); return false;">top-left</button>
+          <button onmousedown="insertPos('top'); return false;">top</button>
+          <button onmousedown="insertPos('top-right'); return false;">top-right</button>
+          <button onmousedown="insertPos('left'); return false;">left</button>
+          <button onmousedown="insertPos('middle'); return false;">middle</button>
+          <button onmousedown="insertPos('right'); return false;">right</button>
+          <button onmousedown="insertPos('bottom-left'); return false;">bottom-left</button>
+          <button onmousedown="insertPos('bottom'); return false;">bottom</button>
+          <button onmousedown="insertPos('bottom-right'); return false;">bottom-right</button>
+        </div>
+      </span>
+      <span class="lay-wrap" id="spWrap">
+        <button onmousedown="toggleSpMenu(); return false;" class="mu-btn mu-lay"
+                title="Blank space left on the page (approximate): {space:N letters|words|lines}">Sp ▾</button>
+        <div class="lay-menu sp-menu" id="spMenu">
+          <label>about <input type="number" id="spQty" min="1" value="2" onmousedown="event.stopPropagation()"></label>
+          <button onmousedown="insertSpace('letters'); return false;">letters</button>
+          <button onmousedown="insertSpace('words'); return false;">words</button>
+          <button onmousedown="insertSpace('lines'); return false;">lines</button>
+        </div>
+      </span>
+      <button onmousedown="wrapTopNote(event); return false;" class="mu-btn mu-margin"
+              title="Note in the top margin: [top: text] · no selection = empty [top: ] to type into">Top</button>
+      <button onmousedown="wrapBottomNote(event); return false;" class="mu-btn mu-margin"
+              title="Note in the bottom margin: [bottom: text] · no selection = empty [bottom: ] to type into">Btm</button>
+    </div>
   </div><!-- /r2 -->
 
   <!-- ── Ribbon 3: Markup toolbar ── -->
@@ -1844,6 +1927,8 @@
               title="Select rows then delete">🗑</button>
       <button onclick="renumberDuplicates()" class="mu-btn"
               title="Fix duplicate line numbers: assigns X.1, X.2… to duplicates">#→</button>
+      <button onclick="renumberAllLines()" class="mu-btn"
+              title="Renumber all lines 1, 2, 3… from the top (restarts after each page break)">1→</button>
     </div>
 
     <div class="r3-sep-wide"></div>
@@ -1875,6 +1960,8 @@
               title="Overwrite: {ov:new|old} — select the visible (overwriting) text; type what is underneath after | if you can read it, or leave it empty">ov</button>
       <button onmousedown="wrapInline(event); return false;" class="mu-btn mu-in"
               title="Inline insertion at baseline: {in:text}">in</button>
+      <button onmousedown="wrapExpansion(event); return false;" class="mu-btn"
+              title="Expansion of an abbreviation: select the supplied letters → atq[ue]">[ ]</button>
       <button onmousedown="wrapHandChange(event); return false;" class="mu-btn mu-hc"
               title="Visible change of hand (no attribution): {hc:text}">hc</button>
     </div>
@@ -1939,6 +2026,10 @@
         <div class="help-row"><span class="help-key">H &nbsp;L</span><span class="help-desc">heading {h:} · paragraph label {lab:}</span></div>
         <div class="help-row"><span class="help-key">M</span><span class="help-desc">[margin: …] — start of line = left, end = right</span></div>
         <div class="help-row"><span class="help-key">AL</span><span class="help-desc">whole added line {al:}</span></div>
+        <div class="help-row"><span class="help-key">1→</span><span class="help-desc">renumber all lines (restarts after page breaks)</span></div>
+        <div class="help-row"><span class="help-key">[ ]</span><span class="help-desc">expansion of an abbreviation: atq[ue]</span></div>
+        <div class="help-row"><span class="help-key">Pos ▾ &nbsp;Sp ▾</span><span class="help-desc">position of a block {pos:…} · blank space {space:…} (Layout)</span></div>
+        <div class="help-row"><span class="help-key">Top &nbsp;Btm</span><span class="help-desc">[top: …] / [bottom: …] margin notes (Layout)</span></div>
         <div class="help-row"><span class="help-key">cw</span><span class="help-desc">catchword {cw:} (Extra Markup)</span></div>
         <div class="help-row"><span class="help-key" style="text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:3px;">u</span><span class="help-desc">underlined in manuscript</span></div>
         <div class="help-row"><span class="help-key">ov</span><span class="help-desc">overwrite {ov:new|old} — old optional</span></div>
@@ -2393,6 +2484,9 @@
                         <line x1="3" y1="6" x2="12" y2="15"/><line x1="6" y1="3" x2="15" y2="12"/>
                         <line x1="12" y1="3" x2="3" y2="12"/><line x1="15" y1="6" x2="6" y2="15"/>
                     </svg></button>
+                <button class="symbol-btn" onclick="insertSymbol('{sign:asterisk}')" title="Asterisk place marker (Newton) → {sign:asterisk}">*</button>
+                <button class="symbol-btn" onclick="insertSymbol('{sign:filler}')" title="Line filler — wavy stroke ending a short line → {sign:filler}">~</button>
+                <button class="symbol-btn" onclick="insertSymbol('⌊')" title="Decimal separatrix — L-shaped mark between whole number and decimals (\lfloor inside $…$)">⌊</button>
                 <button class="symbol-btn" onclick="insertSignUnknown()" title="Unknown sign → {sign:unknown|} — describe it after the | (optional)"
                         style="font-size:13px; font-weight:600; border-style:dashed;">?</button>
             </div>
@@ -2411,7 +2505,7 @@
 // before populateFolioDropdown() and initializeTable() run at parse time.
 // Default value; overwritten at runtime by the project selector.
 var STORAGE_PREFIX = 'newt_ms_add_3965_';
-var NEWT_VERSION = 'newt_v1_27';   // v1.27: stamped into config/backup exports
+var NEWT_VERSION = 'newt_v1_28';   // v1.27: stamped into config/backup exports
 
 // Global state
 let cvColumnVisible = false; // Default to hidden
@@ -3772,6 +3866,7 @@ function saveWork() {
             if (prev.proposedGrouping) saveData.proposedGrouping = prev.proposedGrouping;
             if (prev.tier)             saveData.tier             = prev.tier;
             if (prev.timeSeconds)      saveData.timeSeconds      = prev.timeSeconds;
+            if (prev.pageNote)         saveData.pageNote         = prev.pageNote;
         }
     } catch(e) { /* no existing data, fine */ }
     // v1.27: current tier/timer belong to this unit
@@ -3781,6 +3876,7 @@ function saveWork() {
         if (_t) saveData.tier = parseInt(_t, 10); else delete saveData.tier;
         const _sec = _timerTotal();
         if (_sec > 0) saveData.timeSeconds = _sec; else delete saveData.timeSeconds;
+        if (_pageNote) saveData.pageNote = _pageNote; else delete saveData.pageNote;   // v1.28
     }
     
     try {
@@ -3954,6 +4050,14 @@ function convertHTMLToMarkup(htmlString) {
                     result += '{al:' + convertElement(node) + '}';
                 } else if (node.classList.contains('markup-cw')) {
                     result += '{cw:' + convertElement(node) + '}';
+                } else if (node.classList.contains('markup-pos')) {
+                    result += '{pos:' + convertElement(node) + '}';
+                } else if (node.classList.contains('markup-space')) {
+                    result += '{space:' + convertElement(node) + '}';
+                } else if (node.classList.contains('markup-mtop')) {
+                    result += '[top: ' + convertElement(node) + ']';
+                } else if (node.classList.contains('markup-mbottom')) {
+                    result += '[bottom: ' + convertElement(node) + ']';
                 } else if (node.classList.contains('markup-variable')) {
                     result += '{v:' + convertElement(node) + '}';
                 } else if (node.classList.contains('markup-point')) {
@@ -4306,6 +4410,7 @@ function exportMarkdown(dest) {
         if (_tierV) output += '**Tier:** ' + _tierV + '\n\n';
         const _secV = _timerTotal();
         if (_secV > 0) output += '**Time:** ' + (_secV / 60).toFixed(1) + ' min (' + _fmtTime(_secV) + ')\n\n';
+        if (_pageNote) output += '**Page note:** ' + _pageNote.replace(/\n+/g, ' / ') + '\n\n';   // v1.28
         output += '---\n\n';
         
         let lineCount = 0;
@@ -4370,6 +4475,14 @@ function exportMarkdown(dest) {
                                 result += '{al:' + convertMarkupToText(node) + '}';
                             } else if (node.classList.contains('markup-cw')) {
                                 result += '{cw:' + convertMarkupToText(node) + '}';
+                } else if (node.classList.contains('markup-pos')) {
+                    result += '{pos:' + convertMarkupToText(node) + '}';
+                } else if (node.classList.contains('markup-space')) {
+                    result += '{space:' + convertMarkupToText(node) + '}';
+                } else if (node.classList.contains('markup-mtop')) {
+                    result += '[top: ' + convertMarkupToText(node) + ']';
+                } else if (node.classList.contains('markup-mbottom')) {
+                    result += '[bottom: ' + convertMarkupToText(node) + ']';
                             } else if (node.classList.contains('markup-variable')) {
                                 result += '{v:' + convertMarkupToText(node) + '}';
                             } else if (node.classList.contains('markup-point')) {
@@ -4764,16 +4877,23 @@ function renderMarkup(cell) {
     html = html.replace(/\{l:([^}]+)\}/g, '<span class="markup-line">$1</span>');
     html = html.replace(/\{f:([^}]+)\}/g, '<span class="markup-figure">$1</span>');
 
+    // v1.28 — layout
+    html = html.replace(/\{pos:([^}]+)\}/g,   '<span class="markup-pos" title="position on the page">$1</span>');
+    html = html.replace(/\{space:([^}]+)\}/g, '<span class="markup-space" title="blank space (approximate)">$1</span>');
+
     // v1.27 batch B — structural markup, applied last so inner markup is already rendered
     html = html.replace(/\{cw:([^}]+)\}/g,  '<span class="markup-cw" title="catchword">$1</span>');
     html = html.replace(/\{lab:([^}]+)\}/g, '<span class="markup-lab" title="label">$1</span>');
     html = html.replace(/\{h:([^}]+)\}/g,   '<span class="markup-head" title="heading">$1</span>');
     html = html.replace(/\{al:([^}]+)\}/g,  '<span class="markup-al" title="added line">$1</span>');
-    // [margin: …] — matched with bracket counting, so [ue]-style expansions inside work
-    html = (function(h) {
-        let out = '', i = 0;
+    // [margin: …], [top: …], [bottom: …] — matched with bracket counting,
+    // so [ue]-style expansions and [?…?] inside work
+    [['[margin:', 'markup-marginb', 'margin note'], ['[top:', 'markup-mtop', 'note in the top margin'],
+     ['[bottom:', 'markup-mbottom', 'note in the bottom margin']].forEach(function(spec) {
+        const tag = spec[0];
+        let h = html, out = '', i = 0;
         while (true) {
-            const k = h.indexOf('[margin:', i);
+            const k = h.indexOf(tag, i);
             if (k < 0) { out += h.slice(i); break; }
             let depth = 0, j = k;
             for (; j < h.length; j++) {
@@ -4781,12 +4901,12 @@ function renderMarkup(cell) {
                 else if (h[j] === ']') { depth--; if (depth === 0) break; }
             }
             if (j >= h.length) { out += h.slice(i); break; }     // unclosed: leave as typed
-            out += h.slice(i, k) + '<span class="markup-marginb" title="margin note">' +
-                   h.slice(k + 8, j).replace(/^ /, '') + '</span>';
+            out += h.slice(i, k) + '<span class="' + spec[1] + '" title="' + spec[2] + '">' +
+                   h.slice(k + tag.length, j).replace(/^ /, '') + '</span>';
             i = j + 1;
         }
-        return out;
-    })(html);
+        html = out;
+    });
 
     // Restore protected LaTeX spans as plain (HTML-escaped) text
     html = html.replace(/\u0000M(\d+)\u0000/g, function(_, i) {
@@ -5754,6 +5874,7 @@ function _persistUnitMeta() {
         if (t) obj.tier = parseInt(t, 10); else delete obj.tier;
         const sec = _timerTotal();
         if (sec > 0) obj.timeSeconds = sec; else delete obj.timeSeconds;
+        if (_pageNote) obj.pageNote = _pageNote; else delete obj.pageNote;   // v1.28
         localStorage.setItem(key, JSON.stringify(obj));
     } catch (e) { console.warn('Could not save tier/timer:', e); }
 }
@@ -5807,6 +5928,14 @@ function _metaAfterLoad(unitId, saveData) {
     if (sel) sel.value = (saveData && saveData.tier) ? String(saveData.tier) : '';
     _styleTierSelect();
     _renderTimer();
+    // v1.28: page note belongs to the unit
+    _pageNote = (saveData && saveData.pageNote) || '';
+    _renderPageNoteBtn();
+    // v1.28: refresh the IIIF/local lock button for this unit (it kept the
+    // previous unit's state when a new unit was created)
+    if (unitId && typeof _viewerUpdateLockButton === 'function') {
+        try { _viewerUpdateLockButton(unitId); } catch (e) {}
+    }
 }
 window.addEventListener('beforeunload', function() {
     if (_timerStartedAt) { _timerAccum = _timerTotal(); _timerStartedAt = null; }
@@ -5841,6 +5970,109 @@ document.addEventListener('blur', function(e) {
         setTimeout(refreshPageBreaks, 0);
     }
 }, true);
+
+// ═══════════════════════════════════════════════════════════════════
+// v1.28 — page note, renumber, [ ], layout group
+// ═══════════════════════════════════════════════════════════════════
+let _pageNote = '';
+function _renderPageNoteBtn() {
+    const b = document.getElementById('pageNoteBtn');
+    if (!b) return;
+    b.classList.toggle('has-note', !!_pageNote);
+    b.textContent = _pageNote ? '📝 Page note •' : '📝 Page note';
+}
+function openPageNote() {
+    if (!_currentUnitOK()) { showStatus('Select or create a unit first', 'error'); return; }
+    if (!_metaUnit) _metaUnit = document.getElementById('folioId').value;
+    document.getElementById('pageNoteUnit').textContent = _metaUnit;
+    document.getElementById('pageNoteText').value = _pageNote;
+    document.getElementById('pageNoteModal').style.display = 'flex';
+    setTimeout(function() { document.getElementById('pageNoteText').focus(); }, 30);
+}
+function closePageNote(save) {
+    if (save) {
+        _pageNote = document.getElementById('pageNoteText').value.trim();
+        _persistUnitMeta();
+        _renderPageNoteBtn();
+        showStatus(_pageNote ? 'Page note saved' : 'Page note cleared', 'success');
+    }
+    document.getElementById('pageNoteModal').style.display = 'none';
+}
+
+// Renumber every row 1, 2, 3… from the top, restarting after page breaks
+function renumberAllLines() {
+    const tbody = document.getElementById('tableBody');
+    if (!tbody || !tbody.rows.length) return;
+    if (!confirm('Renumber all lines 1, 2, 3… from the top?\n\nNumbering restarts after each page break, and numbers like 55.1 become whole numbers.')) return;
+    let n = 1, changed = 0;
+    for (const row of tbody.rows) {
+        if (row.classList.contains('pb-row')) { n = 1; continue; }
+        const want = String(n++);
+        if (row.cells[1].textContent !== want) { row.cells[1].textContent = want; changed++; }
+    }
+    showStatus(changed ? 'Renumbered ' + changed + ' lines — Remember to Save!' : 'Line numbers were already in order', 'success');
+}
+
+// [ ] — bracket the selected (supplied) letters of an abbreviation
+function wrapExpansion(event) { if (event) event.preventDefault(); wrapSelectionWith('[', ']', 'Expansion'); }
+
+// Layout group
+function toggleLayoutGroup(show) {
+    ['r2-layout', 'r2-layout-sep', 'r2-layout-label'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.style.display = show ? (id === 'r2-layout' ? 'flex' : 'block') : 'none';
+    });
+    localStorage.setItem(STORAGE_PREFIX + 'toolbar_layout', show ? '1' : '0');
+}
+function _closeLayMenus() { ['posMenu', 'spMenu'].forEach(id => { const m = document.getElementById(id); if (m) m.classList.remove('open'); }); }
+function togglePosMenu() { const m = document.getElementById('posMenu'); const o = m.classList.contains('open'); _closeLayMenus(); if (!o) m.classList.add('open'); }
+let _spTarget = null;   // cell + cursor remembered when the Sp menu opens (typing the number moves focus away)
+function toggleSpMenu() {
+    const m = document.getElementById('spMenu'); const o = m.classList.contains('open'); _closeLayMenus();
+    if (o) return;
+    const cell = _activeCorrectedCell(); if (!cell) return;
+    _spTarget = { cell: cell, off: _getCaretOffsets(cell), len: cell.textContent.length };
+    m.classList.add('open');
+}
+document.addEventListener('mousedown', function(e) {
+    const a = document.getElementById('posWrap'), b = document.getElementById('spWrap');
+    if (a && !a.contains(e.target) && b && !b.contains(e.target)) _closeLayMenus();
+});
+function _activeCorrectedCell() {
+    const sel = window.getSelection();
+    const node = sel && sel.anchorNode;
+    const el = node ? (node.nodeType === Node.TEXT_NODE ? node.parentElement : node) : null;
+    const cell = el && el.closest ? el.closest('.editable') : null;
+    if (!cell) { showStatus('Click in a Corrected Text cell first', 'error'); return null; }
+    if (!cell.classList.contains('col-corrected')) { showStatus('Markup can only be applied in the Corrected Text column', 'error'); return null; }
+    return cell;
+}
+// {pos:…} always goes at the very start of the line (replacing an existing one)
+function insertPos(where) {
+    _closeLayMenus();
+    const cell = _activeCorrectedCell(); if (!cell) return;
+    const txt = cell.textContent;
+    const m = txt.match(/^\{pos:[^}]*\}\s*/);
+    _setCaretOffsets(cell, 0, m ? m[0].length : 0);
+    document.execCommand('insertText', false, '{pos:' + where + '} ');
+    showStatus('Position marked: ' + where + ' (applies from this line until the next {pos:})', 'success');
+}
+function insertSpace(unit) {
+    const q = parseInt(document.getElementById('spQty').value, 10);
+    _closeLayMenus();
+    if (!q || q < 1) { showStatus('Enter a number first', 'error'); return; }
+    const t = _spTarget; _spTarget = null;
+    if (!t || !t.cell) { showStatus('Click in a Corrected Text cell first', 'error'); return; }
+    const cell = t.cell;
+    cell.focus();
+    if (t.off && cell.textContent.length === t.len) _setCaretOffsets(cell, t.off.start, t.off.end);
+    const u = (q === 1) ? unit.replace(/s$/, '') : unit;
+    document.execCommand('insertText', false, '{space:' + q + ' ' + u + '}');
+    showStatus('Blank space marked: about ' + q + ' ' + u, 'success');
+}
+function wrapTopNote(event)    { if (event) event.preventDefault(); _structWrap('[top: ', ']', 'Top-margin note', 'insert'); }
+function wrapBottomNote(event) { if (event) event.preventDefault(); _structWrap('[bottom: ', ']', 'Bottom-margin note', 'insert'); }
 
 // v1.27 batch C — unknown sign: insert {sign:unknown|} and leave the cursor
 // after the |, so a description can be typed (or left empty)
@@ -7532,7 +7764,7 @@ function _doImportOptica(data) {
 
         try {
             var _rec = { folio: unit.id, timestamp: ts, data: rows };
-            ['tier', 'timeSeconds', 'cluster', 'clusterCert', 'proposedGrouping'].forEach(function(f) {
+            ['tier', 'timeSeconds', 'pageNote', 'cluster', 'clusterCert', 'proposedGrouping'].forEach(function(f) {
                 if (unit[f] !== undefined) _rec[f] = unit[f];   // v1.27
             });
             localStorage.setItem(prefix + unit.id, JSON.stringify(_rec));
@@ -7798,6 +8030,8 @@ function applySettingsToUI(cfg) {
 function applyFeatureFlags() {
     var features = (getActiveProject().features) || {};
     // v1.27: timer is shown/hidden rather than greyed out
+    var _pnb = document.getElementById('pageNoteBtn');
+    if (_pnb) _pnb.style.display = features.pageNotes ? '' : 'none';
     var _tw = document.getElementById('timerWrap');
     if (_tw) {
         _tw.style.display = features.timer ? 'inline-flex' : 'none';
@@ -8521,7 +8755,7 @@ function exportSingleProjectJSON() {
         var rows = Array.isArray(raw.data) ? raw.data : [];
         // v1.27: carry per-unit tier, time and cluster info as well
         var _u = { id: unitId, rows: rows };
-        ['tier', 'timeSeconds', 'cluster', 'clusterCert', 'proposedGrouping'].forEach(function(f) {
+        ['tier', 'timeSeconds', 'pageNote', 'cluster', 'clusterCert', 'proposedGrouping'].forEach(function(f) {
             if (raw[f] !== undefined) _u[f] = raw[f];
         });
         units.push(_u);
@@ -8578,6 +8812,11 @@ window.addEventListener('DOMContentLoaded', () => {
         toggleGeoGroup(true);
         const _chk = document.getElementById('chkGeo');
         if (_chk) _chk.checked = true;
+    }
+    if (localStorage.getItem(STORAGE_PREFIX + 'toolbar_layout') === '1') {
+        toggleLayoutGroup(true);
+        const _chkL = document.getElementById('chkLayout');
+        if (_chkL) _chkL.checked = true;
     }
     if (localStorage.getItem(STORAGE_PREFIX + 'toolbar_extra') === '1') {
         toggleExtraGroup(true);
@@ -9395,6 +9634,10 @@ function exportClusterJSON() {
       </div>
       <div class="s-toggle-row" data-feature="clusterAssignment">
         <div><div class="s-toggle-name">Clusters</div><div class="s-toggle-desc">Assign units to named clusters or sections</div></div>
+        <div class="s-toggle" onclick="toggleFeature(this)"></div>
+      </div>
+      <div class="s-toggle-row" data-feature="pageNotes">
+        <div><div class="s-toggle-name">Page notes</div><div class="s-toggle-desc">A comment on the whole page, via a 📝 button in the top row</div></div>
         <div class="s-toggle" onclick="toggleFeature(this)"></div>
       </div>
       <div class="s-toggle-row" data-feature="timer">
