@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Newt — Newton Manuscript Correction Interface v1.24</title>
+    <title>Newt — Newton Manuscript Correction Interface v1.28</title>
 
-    <!-- Newt v1.24 — see CHANGELOG.md -->
+    <!-- Newt v1.28 — see CHANGELOG.md -->
 
     <!-- Cache-control hints for GitHub Pages, which doesn't allow setting real
          HTTP cache headers. Meta tags are honoured inconsistently across
@@ -233,6 +233,23 @@
             text-decoration-thickness: 2px;
             text-underline-offset: 2px;
         }
+        .markup-bold { font-weight: 800; }
+        /* v1.27 batch B — structure: tag shown via ::before so it is not part of the text */
+        .markup-marginb { background: #F0E6FF; border-radius: 2px; color: #4A0080; }
+        .markup-marginb::before { content: "margin: "; font-size: 0.8em; opacity: .7; }
+        .markup-head::before, .markup-lab::before, .markup-al::before, .markup-cw::before {
+            font-size: 0.7em; font-weight: 600; color: #fff; background: #607D8B;
+            border-radius: 2px; padding: 0 3px; margin-right: 3px; vertical-align: 1px; }
+        .markup-head::before { content: "H"; }
+        .markup-head { font-weight: 600; }
+        .markup-lab::before  { content: "L"; }
+        .markup-lab { font-weight: 600; }
+        .markup-al::before   { content: "AL"; }
+        .markup-al { border-left: 2px solid #607D8B; padding-left: 3px; }
+        .markup-cw::before   { content: "cw"; }
+        .markup-hc { outline: 1px dashed #555; outline-offset: 1px; border-radius: 2px; }
+        .markup-nadd { color: #1B7A34; text-decoration: underline double; text-underline-offset: 2px; }
+        .markup-supp { color: #777; font-style: italic; }
         .markup-overwrite {
             background: #FFF3E0;
             padding: 0 2px;
@@ -1226,6 +1243,75 @@
         .mu-ov     { background: #fff3e0; border-color: #E65100; color: #bf360c; }
         .mu-in     { background: #FFFDE7; border-color: #795548; color: #795548; }
         .mu-sd     { border-color: #c0392b; color: #c0392b; }
+        /* v1.27 batch A */
+        .mu-bold   { font-weight: 800; }
+        .mu-struct { border-color: #607D8B; color: #37474F; font-weight: 600; }
+        /* v1.27 batch D — tier, timer, page breaks */
+        .tier-select { font-size: 11px; padding: 3px 4px; border: 1px solid #ccc; border-radius: 4px;
+                       background: #fff; color: #555; cursor: pointer; font-family: inherit; font-weight: 700; }
+        /* v1.27: muted tints + strong border, bold dark text for readability */
+        .tier-select.t1 { background: #DCEAF8; border: 2px solid #2196F3; color: #0D47A1; }
+        .tier-select.t2 { background: #DFF0DF; border: 2px solid #4CAF50; color: #1B5E20; }
+        .tier-select.t3 { background: #FBF3C4; border: 2px solid #E2C800; color: #5D4E00; }
+        .tier-select.t4 { background: #FCE6CC; border: 2px solid #FF9800; color: #8A4B00; }
+        .tier-select.t5 { background: #F9DAD7; border: 2px solid #F44336; color: #8E1B12; }
+        .tier-select option { background: #fff; color: #333; font-weight: 700; }
+        .tier-select option[value="1"] { background: #DCEAF8; color: #0D47A1; }
+        .tier-select option[value="2"] { background: #DFF0DF; color: #1B5E20; }
+        .tier-select option[value="3"] { background: #FBF3C4; color: #5D4E00; }
+        .tier-select option[value="4"] { background: #FCE6CC; color: #8A4B00; }
+        .tier-select option[value="5"] { background: #F9DAD7; color: #8E1B12; }
+        .r1-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+        /* v1.28 */
+        .pagenote-btn { font-size: 11px; padding: 3px 7px; border: 1px solid #ccc; border-radius: 4px; background: #fff; cursor: pointer; font-family: inherit; }
+        .pagenote-btn.has-note { border-color: #8E7CC3; background: #F1ECFA; font-weight: 600; }
+        .pn-modal { position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 100000; display: flex; align-items: center; justify-content: center; }
+        .pn-box { background: #fff; border-radius: 6px; padding: 14px 16px; width: min(560px, 92vw); box-shadow: 0 4px 20px rgba(0,0,0,.25); }
+        .pn-title { font-weight: 700; margin-bottom: 4px; }
+        .pn-desc { font-size: 11px; color: #666; margin-bottom: 8px; line-height: 1.4; }
+        .pn-box textarea { width: 100%; box-sizing: border-box; font: 13px/1.4 inherit; padding: 6px; border: 1px solid #ccc; border-radius: 4px; }
+        .pn-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+        .pn-actions button { padding: 5px 12px; border: 1px solid #ccc; border-radius: 4px; background: #fff; cursor: pointer; }
+        .pn-actions .pn-save { background: #4A6FA5; border-color: #4A6FA5; color: #fff; }
+        .mu-lay { border-color: #8D6E63; color: #5D4037; }
+        .lay-wrap { position: relative; display: inline-block; }
+        .lay-menu { display: none; position: absolute; top: 100%; left: 0; z-index: 1000; margin-top: 2px; background: #fff;
+                    border: 1px solid #8D6E63; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,.15); padding: 4px; }
+        .lay-menu.open { display: grid; }
+        .pos-grid.open { grid-template-columns: repeat(3, auto); gap: 3px; }
+        .sp-menu.open { grid-template-columns: auto auto auto auto; gap: 4px; align-items: center; white-space: nowrap; }
+        .lay-menu button { font-size: 11px; padding: 4px 6px; border: 1px solid #ddd; border-radius: 3px; background: #fafafa; cursor: pointer; }
+        .lay-menu button:hover { background: #EFEBE9; }
+        .sp-menu input { width: 42px; font-size: 11px; }
+        .sp-menu label { font-size: 11px; }
+        .markup-pos { font-size: 0.75em; color: #5D4037; background: #EFEBE9; border-radius: 2px; padding: 0 3px; }
+        .markup-pos::before { content: "⌖ "; }
+        .markup-space { font-size: 0.75em; color: #777; border: 1px dashed #aaa; border-radius: 2px; padding: 0 3px; }
+        .markup-space::before { content: "␣ "; }
+        .markup-mtop, .markup-mbottom { background: #F0E6FF; border-radius: 2px; color: #4A0080; }
+        .markup-mtop::before { content: "top: "; font-size: 0.8em; opacity: .7; }
+        .markup-mbottom::before { content: "bottom: "; font-size: 0.8em; opacity: .7; }
+        .timer-wrap { display: inline-flex; align-items: center; gap: 3px; border: 1px solid #ccc;
+                      border-radius: 4px; padding: 1px 4px; background: #fff; }
+        .timer-wrap.running { border-color: #4CAF50; background: #F1F8E9; }
+        .timer-btn, .timer-reset { border: none; background: none; cursor: pointer; font-size: 12px; padding: 2px 3px; }
+        .timer-reset { color: #999; font-size: 11px; }
+        .timer-display { font-size: 12px; font-variant-numeric: tabular-nums; min-width: 38px; text-align: right; }
+        tr.pb-row td { background: #E8EDF2 !important; border-top: 2px dashed #90A4AE; border-bottom: 2px dashed #90A4AE; }
+        tr.pb-row td.col-htr, tr.pb-row td.col-corrected { text-align: center; color: #546E7A;
+                       font-size: 11px; letter-spacing: .15em; }
+        .mu-hc     { border-style: dashed; border-color: #555; }
+        .mu-nadd   { color: #1B7A34; text-decoration: underline double; text-underline-offset: 2px; }
+        .mu-supp   { font-style: italic; color: #777; }
+        .u-menu-wrap { position: relative; display: inline-block; }
+        .u-menu { display: none; position: absolute; top: 100%; left: 0; z-index: 1000; margin-top: 2px;
+                  background: #fff; border: 1px solid #ff9800; border-radius: 4px;
+                  box-shadow: 0 2px 8px rgba(0,0,0,.15); padding: 3px; min-width: 210px; }
+        .u-menu.open { display: block; }
+        .u-menu button { display: block; width: 100%; text-align: left; background: none; border: none;
+                         padding: 5px 8px; font-size: 12px; cursor: pointer; border-radius: 3px; white-space: nowrap; }
+        .u-menu button:hover { background: #fff3cd; }
+        .u-menu code { color: #8a5a00; font-size: 11px; }
         .mu-geo    { background: #f5f5f5; border-color: #bbb; color: #555; }
         .mu-phase  { background: #f0f0f0; border-color: #bbb; color: #444; }
         .mu-del    { color: #d32f2f; border-color: #f09595; }
@@ -1581,6 +1667,19 @@
 </head>
 <body>
 
+<!-- v1.28: page note popup -->
+<div id="pageNoteModal" class="pn-modal" style="display:none">
+  <div class="pn-box">
+    <div class="pn-title">Page note — <span id="pageNoteUnit"></span></div>
+    <div class="pn-desc">A comment about the whole page. Saved with the unit, shown in the Corrected MD header and read by the XML agent. Not included in the public TEI.</div>
+    <textarea id="pageNoteText" rows="7"></textarea>
+    <div class="pn-actions">
+      <button onclick="closePageNote(false)">Cancel</button>
+      <button class="pn-save" onclick="closePageNote(true)">Save note</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── Migration banner (v29a) ────────────────────────────────────────
      Shown when old newton_* keys are detected. Blocks the interface
      until the user exports a backup and confirms migration.          -->
@@ -1661,6 +1760,14 @@
       <button class="t-plus" onclick="newUnitPrompt()" title="New unit">+</button>
       <button class="t-icon-btn" onclick="renameFolio()" title="Rename unit">✏</button>
       <button class="t-icon-btn t-icon-del" onclick="deleteFolio()" id="deleteFolioBtn" title="Delete unit">🗑</button>
+      <select id="tierSelect" class="tier-select" onchange="onTierChange()" title="Difficulty tier for this unit">
+        <option value="">Tier –</option>
+        <option value="1">Tier 1</option>
+        <option value="2">Tier 2</option>
+        <option value="3">Tier 3</option>
+        <option value="4">Tier 4</option>
+        <option value="5">Tier 5</option>
+      </select>
       <button id="clusterBadge" class="cluster-badge" onclick="openClusterModal()"
               title="Assign or view cluster for this folio" style="font-size:11px; padding:4px 8px;">
         🔗 <span id="clusterBadgeLabel">+ Cluster</span>
@@ -1679,10 +1786,19 @@
 
     <div class="r1-sep"></div>
 
-    <!-- Settings (placeholder for v1.0) -->
-    <button class="t-settings"
-            onclick="openSettings()"
-            title="Project settings">⚙ Settings</button>
+    <!-- v1.27: timer (optional) + Settings, kept together at the right -->
+    <div class="r1-right">
+        <button id="pageNoteBtn" class="pagenote-btn" onclick="openPageNote()" style="display:none"
+                title="Page note — a comment on the whole page (not exported to TEI; read by the XML agent)">📝 Page note</button>
+        <span id="timerWrap" class="timer-wrap" style="display:none" title="Time spent on this unit (Settings → Features → Timer)">
+          <button id="timerBtn" class="timer-btn" onclick="toggleTimer()" title="Start / pause timer for this unit">▶</button>
+          <span id="timerDisplay" class="timer-display">0:00</span>
+          <button class="timer-reset" onclick="resetTimer()" title="Reset this unit's timer">↺</button>
+        </span>
+      <button class="t-settings"
+              onclick="openSettings()"
+              title="Project settings">⚙ Settings</button>
+    </div>
 
   </div><!-- /r1 -->
 
@@ -1706,9 +1822,79 @@
         <div class="add-panel-title">Optional toolbar groups</div>
         <label class="add-option">
           <input type="checkbox" id="chkGeo" onchange="toggleGeoGroup(this.checked)">
-          Geometry — v &nbsp;p &nbsp;l &nbsp;f
+          Geometry
+        </label>
+        <label class="add-option">
+          <input type="checkbox" id="chkExtra" onchange="toggleExtraGroup(this.checked)">
+          Extra Markup
+        </label>
+        <label class="add-option">
+          <input type="checkbox" id="chkLayout" onchange="toggleLayoutGroup(this.checked)">
+          Layout
         </label>
       </div>
+    </div>
+
+    <!-- v1.27: optional groups now sit on this row, next to Additional -->
+    <div id="r3-geo-sep" class="r3-sep" style="display:none;"></div>
+    <span id="r3-geo-label" class="r3-label" style="display:none;">geo:</span>
+    <div id="r3-geo" class="r3-group" style="display:none;">
+      <button onmousedown="wrapVariable(event); return false;" class="mu-btn mu-geo"
+              title="Variable — scalar magnitude: {v:text}">v</button>
+      <button onmousedown="wrapPoint(event); return false;" class="mu-btn mu-geo"
+              title="Point — geometric vertex: {p:text}">p</button>
+      <button onmousedown="wrapLine(event); return false;" class="mu-btn mu-geo"
+              title="Line segment — two-letter label: {l:text}">l</button>
+      <button onmousedown="wrapFigure(event); return false;" class="mu-btn mu-geo"
+              title="Figure / polygon: {f:text}">f</button>
+    </div>
+
+    <div id="r2-extra-sep" class="r3-sep" style="display:none;"></div>
+    <span id="r2-extra-label" class="r3-label" style="display:none;">extra:</span>
+    <div id="r2-extra" class="r3-group" style="display:none;">
+      <button onmousedown="wrapAbbreviation(event); return false;" class="mu-btn"
+              title="Abbreviation + expansion: {abbr:text|expansion}">ab</button>
+      <button onmousedown="wrapNestedAdd(event); return false;" class="mu-btn mu-nadd"
+              title="Addition inside an addition: {nadd:text} — use inside ^…^">nadd</button>
+      <button onmousedown="wrapSupplied(event); return false;" class="mu-btn mu-supp"
+              title="Supplied — letters not visible on the page (gutter, damage): {supp:text}">supp</button>
+      <button onmousedown="wrapCatchword(event); return false;" class="mu-btn"
+              title="Catchword: {cw:text}">cw</button>
+    </div>
+
+    <!-- v1.28: Layout group -->
+    <div id="r2-layout-sep" class="r3-sep" style="display:none;"></div>
+    <span id="r2-layout-label" class="r3-label" style="display:none;">layout:</span>
+    <div id="r2-layout" class="r3-group" style="display:none;">
+      <span class="lay-wrap" id="posWrap">
+        <button onmousedown="togglePosMenu(); return false;" class="mu-btn mu-lay"
+                title="Position on the page of the block starting on this line: {pos:…} at the start of the line">Pos ▾</button>
+        <div class="lay-menu pos-grid" id="posMenu">
+          <button onmousedown="insertPos('top-left'); return false;">top-left</button>
+          <button onmousedown="insertPos('top'); return false;">top</button>
+          <button onmousedown="insertPos('top-right'); return false;">top-right</button>
+          <button onmousedown="insertPos('left'); return false;">left</button>
+          <button onmousedown="insertPos('middle'); return false;">middle</button>
+          <button onmousedown="insertPos('right'); return false;">right</button>
+          <button onmousedown="insertPos('bottom-left'); return false;">bottom-left</button>
+          <button onmousedown="insertPos('bottom'); return false;">bottom</button>
+          <button onmousedown="insertPos('bottom-right'); return false;">bottom-right</button>
+        </div>
+      </span>
+      <span class="lay-wrap" id="spWrap">
+        <button onmousedown="toggleSpMenu(); return false;" class="mu-btn mu-lay"
+                title="Blank space left on the page (approximate): {space:N letters|words|lines}">Sp ▾</button>
+        <div class="lay-menu sp-menu" id="spMenu">
+          <label>about <input type="number" id="spQty" min="1" value="2" onmousedown="event.stopPropagation()"></label>
+          <button onmousedown="insertSpace('letters'); return false;">letters</button>
+          <button onmousedown="insertSpace('words'); return false;">words</button>
+          <button onmousedown="insertSpace('lines'); return false;">lines</button>
+        </div>
+      </span>
+      <button onmousedown="wrapTopNote(event); return false;" class="mu-btn mu-margin"
+              title="Note in the top margin: [top: text] · no selection = empty [top: ] to type into">Top</button>
+      <button onmousedown="wrapBottomNote(event); return false;" class="mu-btn mu-margin"
+              title="Note in the bottom margin: [bottom: text] · no selection = empty [bottom: ] to type into">Btm</button>
     </div>
   </div><!-- /r2 -->
 
@@ -1734,6 +1920,8 @@
               title="Select rows then delete">🗑</button>
       <button onclick="renumberDuplicates()" class="mu-btn"
               title="Fix duplicate line numbers: assigns X.1, X.2… to duplicates">#→</button>
+      <button onclick="renumberAllLines()" class="mu-btn"
+              title="Renumber all lines 1, 2, 3… from the top (restarts after each page break)">1→</button>
     </div>
 
     <div class="r3-sep-wide"></div>
@@ -1746,22 +1934,43 @@
               title="Mark addition: ^text^ · Cmd/Ctrl+↑">^add^</button>
       <button onmousedown="wrapUnderline(event); return false;" class="mu-btn mu-underline"
               title="Underlined in manuscript: {u:text}">u</button>
+      <button onmousedown="wrapBold(event); return false;" class="mu-btn mu-bold"
+              title="Bold in manuscript: {b:text}">b</button>
       <button onmousedown="wrapLatexInline(event); return false;" class="mu-btn mu-math"
               title="Wrap selection in LaTeX: $…$">$…$</button>
-      <button onmousedown="wrapAbbreviation(event); return false;" class="mu-btn"
-              title="Abbreviation + expansion: {abbr:text|expansion}">ab</button>
       <button onmousedown="wrapDataLayer(event); return false;" class="mu-btn mu-dl"
               title="Data layer flag: {DL:text}">DL</button>
-      <button onmousedown="wrapMargin(event); return false;" class="mu-btn mu-margin"
-              title="Marginal addition: {M:text}">M</button>
-      <button onmousedown="insertUnclear(); return false;" class="mu-btn mu-warn"
-              title="Mark unclear/illegible: [?text?]">U</button>
+      <span class="u-menu-wrap" id="uMenuWrap">
+        <button onmousedown="toggleUnclearMenu(); return false;" class="mu-btn mu-warn"
+                title="Uncertain reading: [?mid: text?] / [?low: text?] · illegible: [?unclear?]">U ▾</button>
+        <div class="u-menu" id="uMenu">
+          <button onmousedown="applyUnclear('mid'); return false;" title="Select the reading first">mid — fairly sure <code>[?mid: …?]</code></button>
+          <button onmousedown="applyUnclear('low'); return false;" title="Select the reading first">low — best guess <code>[?low: …?]</code></button>
+          <button onmousedown="applyUnclear('unclear'); return false;" title="Inserted at the cursor (replaces any selection)">illegible <code>[?unclear?]</code></button>
+        </div>
+      </span>
       <button onmousedown="wrapOverwrite(event); return false;" class="mu-btn mu-ov"
-              title="Overwrite — text written over illegible base: {ov:text}">ov</button>
+              title="Overwrite: {ov:new|old} — select the visible (overwriting) text; type what is underneath after | if you can read it, or leave it empty">ov</button>
       <button onmousedown="wrapInline(event); return false;" class="mu-btn mu-in"
               title="Inline insertion at baseline: {in:text}">in</button>
-      <button onclick="applySDToCurrentRow()" class="mu-btn mu-sd"
-              title="Toggle section deletion for this row">🗑 SD</button>
+      <button onmousedown="wrapExpansion(event); return false;" class="mu-btn"
+              title="Expansion of an abbreviation: select the supplied letters → atq[ue]">[ ]</button>
+      <button onmousedown="wrapHandChange(event); return false;" class="mu-btn mu-hc"
+              title="Visible change of hand (no attribution): {hc:text}">hc</button>
+    </div>
+
+    <div class="r3-sep"></div>
+
+    <span class="r3-label">structure:</span>
+    <div class="r3-group">
+      <button onmousedown="wrapHeading(event); return false;" class="mu-btn mu-struct"
+              title="Heading — standalone title on its own line: {h:text} · no selection = whole line">H</button>
+      <button onmousedown="wrapLabel(event); return false;" class="mu-btn mu-struct"
+              title="Label — number/title opening a paragraph: {lab:text}">L</button>
+      <button onmousedown="wrapMargin(event); return false;" class="mu-btn mu-margin"
+              title="Margin note: [margin: text] — start of line = left margin, end of line = right · no selection = empty [margin: ] to type into">M</button>
+      <button onmousedown="wrapAddedLine(event); return false;" class="mu-btn mu-struct"
+              title="Added line — whole line added (no caret); the crossed-out line stays on its own row: {al:text} · no selection = whole line">AL</button>
     </div>
 
     <div class="r3-sep-wide"></div>
@@ -1777,20 +1986,6 @@
               title="Transform selected text to Sentence case &#x2014; first letter caps, rest lowercase">Aa</button>
       <button onmousedown="transformCase('lower'); return false;" class="mu-btn"
               title="Transform selected text to all lowercase">aa</button>
-    </div>
-
-    <div id="r3-geo-sep" class="r3-sep" style="display:none;"></div>
-
-    <span id="r3-geo-label" class="r3-label" style="display:none;">geo:</span>
-    <div id="r3-geo" class="r3-group" style="display:none;">
-      <button onmousedown="wrapVariable(event); return false;" class="mu-btn mu-geo"
-              title="Variable — scalar magnitude: {v:text}">v</button>
-      <button onmousedown="wrapPoint(event); return false;" class="mu-btn mu-geo"
-              title="Point — geometric vertex: {p:text}">p</button>
-      <button onmousedown="wrapLine(event); return false;" class="mu-btn mu-geo"
-              title="Line segment — two-letter label: {l:text}">l</button>
-      <button onmousedown="wrapFigure(event); return false;" class="mu-btn mu-geo"
-              title="Figure / polygon: {f:text}">f</button>
     </div>
 
     <div id="r3-phase-sep" class="r3-sep" style="display:none;"></div>
@@ -1813,15 +2008,25 @@
         <div class="help-row"><span class="help-key">Enter (in unit dropdown)</span><span class="help-desc">create new unit</span></div>
         <div class="help-divider"></div>
         <div class="help-section-title">Button reference</div>
-        <div class="help-row"><span class="help-key">U</span><span class="help-desc">[unclear] — illegible text</span></div>
+        <div class="help-row"><span class="help-key">U ▾</span><span class="help-desc">[?mid: …?] / [?low: …?] uncertain · [?unclear?] illegible</span></div>
+        <div class="help-row"><span class="help-key" style="font-weight:800">b</span><span class="help-desc">bold in manuscript</span></div>
+        <div class="help-row"><span class="help-key">hc</span><span class="help-desc">visible change of hand (no attribution)</span></div>
+        <div class="help-row"><span class="help-key">nadd</span><span class="help-desc">addition inside an addition</span></div>
+        <div class="help-row"><span class="help-key">supp</span><span class="help-desc">supplied — letters not visible</span></div>
         <div class="help-row"><span class="help-key">$&hellip;$</span><span class="help-desc">inline LaTeX</span></div>
         <div class="help-row"><span class="help-key">ab</span><span class="help-desc">abbreviation + expansion</span></div>
         <div class="help-row"><span class="help-key">DL</span><span class="help-desc">data layer flag</span></div>
-        <div class="help-row"><span class="help-key">M</span><span class="help-desc">marginal addition</span></div>
+        <div class="help-row"><span class="help-key">H &nbsp;L</span><span class="help-desc">heading {h:} · paragraph label {lab:}</span></div>
+        <div class="help-row"><span class="help-key">M</span><span class="help-desc">[margin: …] — start of line = left, end = right</span></div>
+        <div class="help-row"><span class="help-key">AL</span><span class="help-desc">whole added line {al:}</span></div>
+        <div class="help-row"><span class="help-key">1→</span><span class="help-desc">renumber all lines (restarts after page breaks)</span></div>
+        <div class="help-row"><span class="help-key">[ ]</span><span class="help-desc">expansion of an abbreviation: atq[ue]</span></div>
+        <div class="help-row"><span class="help-key">Pos ▾ &nbsp;Sp ▾</span><span class="help-desc">position of a block {pos:…} · blank space {space:…} (Layout)</span></div>
+        <div class="help-row"><span class="help-key">Top &nbsp;Btm</span><span class="help-desc">[top: …] / [bottom: …] margin notes (Layout)</span></div>
+        <div class="help-row"><span class="help-key">cw</span><span class="help-desc">catchword {cw:} (Extra Markup)</span></div>
         <div class="help-row"><span class="help-key" style="text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:3px;">u</span><span class="help-desc">underlined in manuscript</span></div>
-        <div class="help-row"><span class="help-key">ov</span><span class="help-desc">overwrite — written over illegible text</span></div>
+        <div class="help-row"><span class="help-key">ov</span><span class="help-desc">overwrite {ov:new|old} — old optional</span></div>
         <div class="help-row"><span class="help-key">in</span><span class="help-desc">inline insertion at baseline</span></div>
-        <div class="help-row"><span class="help-key">SD</span><span class="help-desc">toggle section deletion (whole row)</span></div>
         <div class="help-row"><span class="help-key">v &nbsp;p &nbsp;l &nbsp;f</span><span class="help-desc">variable / point / line / figure</span></div>
         <div class="help-row"><span class="help-key">P0&ndash;P3, P?</span><span class="help-desc">genetic encoding phase</span></div>
         <div class="help-note">Markup buttons only apply within the Corrected Text column.</div>
@@ -2243,7 +2448,7 @@
                 <button class="symbol-btn" onclick="insertSymbol('☍')" title="Opposition">☍</button>
             </div>
             
-            <h4 style="margin: 15px 0 5px 0; font-size: 12px; color: #666;">Mathematical & Other</h4>
+            <h4 style="margin: 15px 0 5px 0; font-size: 12px; color: #666;">Mathematical</h4>
             <div class="symbol-grid">
                 <button class="symbol-btn" onclick="insertSymbol('°')">°</button>
                 <button class="symbol-btn" onclick="insertSymbol('′')" title="Prime (arcminutes)">′</button>
@@ -2261,7 +2466,22 @@
                 <button class="symbol-btn" onclick="insertSymbol('∑')">∑</button>
                 <button class="symbol-btn" onclick="insertSymbol('∴')" title="Therefore">∴</button>
                 <button class="symbol-btn" onclick="insertSymbol('∵')" title="Because">∵</button>
-                <button class="symbol-btn" onclick="insertSymbol('¬')" title="Line end marker (¬)">¬</button>
+            </div>
+
+            <h4 style="margin: 15px 0 5px 0; font-size: 12px; color: #666;">Other Signs</h4>
+            <div class="symbol-grid">
+                <button class="symbol-btn" onclick="insertSymbol('¬')" title="Line-end hyphen (word continues on next line)">¬</button>
+                <button class="symbol-btn" onclick="insertSymbol('‸')" title="Caret — visible insertion mark: ‸ (place before the ^addition^)">‸</button>
+                <button class="symbol-btn" onclick="insertSymbol('{sign:double-x}')" title="Reference sign (signe de renvoi): two interlaced X's → {sign:double-x}">
+                    <svg width="18" height="18" viewBox="0 0 18 18" style="vertical-align:middle" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                        <line x1="3" y1="6" x2="12" y2="15"/><line x1="6" y1="3" x2="15" y2="12"/>
+                        <line x1="12" y1="3" x2="3" y2="12"/><line x1="15" y1="6" x2="6" y2="15"/>
+                    </svg></button>
+                <button class="symbol-btn" onclick="insertSymbol('{sign:asterisk}')" title="Asterisk place marker (Newton) → {sign:asterisk}">*</button>
+                <button class="symbol-btn" onclick="insertSymbol('{sign:filler}')" title="Line filler — wavy stroke ending a short line → {sign:filler}">~</button>
+                <button class="symbol-btn" onclick="insertSymbol('⌊')" title="Decimal separatrix — L-shaped mark between whole number and decimals (\lfloor inside $…$)">⌊</button>
+                <button class="symbol-btn" onclick="insertSignUnknown()" title="Unknown sign → {sign:unknown|} — describe it after the | (optional)"
+                        style="font-size:13px; font-weight:600; border-style:dashed;">?</button>
             </div>
         </div>
         <div style="margin-top: 15px; text-align: right;">
@@ -2278,6 +2498,7 @@
 // before populateFolioDropdown() and initializeTable() run at parse time.
 // Default value; overwritten at runtime by the project selector.
 var STORAGE_PREFIX = 'newt_ms_add_3965_';
+var NEWT_VERSION = 'newt_v1_28';   // v1.27: stamped into config/backup exports
 
 // Global state
 let cvColumnVisible = false; // Default to hidden
@@ -2288,6 +2509,54 @@ let selectedCells = [];
 // Symbol picker - save cursor position
 let savedRange = null;
 let savedCell = null;
+
+// v1.27: cursor position saved as character offsets in the cell's raw text.
+// A saved Range does not survive the Corrected cell being re-rendered on blur
+// (opening the symbol picker blurs the cell, which replaces its contents), and
+// re-focusing the cell moves the cursor to the end — so symbols were always
+// inserted at the end of the line. Offsets survive both.
+let savedOffsets = null;   // { cell, start, end, len }
+
+function _getCaretOffsets(cell) {
+    const sel = window.getSelection();
+    if (!cell || sel.rangeCount === 0) return null;
+    const r = sel.getRangeAt(0);
+    if (!cell.contains(r.startContainer) || !cell.contains(r.endContainer)) return null;
+    const pre = document.createRange();
+    pre.selectNodeContents(cell);
+    pre.setEnd(r.startContainer, r.startOffset);
+    const start = pre.toString().length;
+    pre.setEnd(r.endContainer, r.endOffset);
+    const end = pre.toString().length;
+    return { cell: cell, start: start, end: end, len: cell.textContent.length };
+}
+
+function _setCaretOffsets(cell, start, end) {
+    function locate(target) {
+        const walker = document.createTreeWalker(cell, NodeFilter.SHOW_TEXT);
+        let pos = 0, node, last = null;
+        while ((node = walker.nextNode())) {
+            const n = node.textContent.length;
+            if (target <= pos + n) return { node: node, offset: target - pos };
+            pos += n; last = node;
+        }
+        return last ? { node: last, offset: last.textContent.length } : { node: cell, offset: 0 };
+    }
+    const a = locate(start), b = locate(end);
+    const range = document.createRange();
+    range.setStart(a.node, a.offset);
+    range.setEnd(b.node, b.offset);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+}
+
+function _rememberCaret(target) {
+    const cell = target && target.closest ? target.closest('.editable') : null;
+    if (!cell) return;
+    const off = _getCaretOffsets(cell);
+    if (off) savedOffsets = off;
+}
 
 // Track focused cell and save cursor position
 document.addEventListener('focus', function(e) {
@@ -2304,6 +2573,7 @@ document.addEventListener('focus', function(e) {
 
 // Update savedRange when user types or moves cursor
 document.addEventListener('keyup', function(e) {
+    _rememberCaret(e.target);
     if (e.target.classList.contains('editable')) {
         savedCell = e.target;
         const selection = window.getSelection();
@@ -2315,6 +2585,7 @@ document.addEventListener('keyup', function(e) {
 
 // Update savedRange when user clicks within a cell
 document.addEventListener('click', function(e) {
+    _rememberCaret(e.target);
     if (e.target.classList.contains('editable')) {
         savedCell = e.target;
         const selection = window.getSelection();
@@ -3586,8 +3857,20 @@ function saveWork() {
             if (prev.cluster)          saveData.cluster          = prev.cluster;
             if (prev.clusterCert)      saveData.clusterCert      = prev.clusterCert;
             if (prev.proposedGrouping) saveData.proposedGrouping = prev.proposedGrouping;
+            if (prev.tier)             saveData.tier             = prev.tier;
+            if (prev.timeSeconds)      saveData.timeSeconds      = prev.timeSeconds;
+            if (prev.pageNote)         saveData.pageNote         = prev.pageNote;
         }
     } catch(e) { /* no existing data, fine */ }
+    // v1.27: current tier/timer belong to this unit
+    if (_metaUnit === folioId || !_metaUnit) {
+        _metaUnit = folioId;
+        const _t = document.getElementById('tierSelect').value;
+        if (_t) saveData.tier = parseInt(_t, 10); else delete saveData.tier;
+        const _sec = _timerTotal();
+        if (_sec > 0) saveData.timeSeconds = _sec; else delete saveData.timeSeconds;
+        if (_pageNote) saveData.pageNote = _pageNote; else delete saveData.pageNote;   // v1.28
+    }
     
     try {
         localStorage.setItem(STORAGE_PREFIX + folioId, JSON.stringify(saveData));
@@ -3697,6 +3980,7 @@ function renameFolio() {
         }
     }
 
+    if (_metaUnit === oldId) _metaUnit = trimmed;
     showStatus('✏️ Folio renamed: "' + oldId + '" → "' + trimmed + '"', 'success');
 }
 
@@ -3741,6 +4025,32 @@ function convertHTMLToMarkup(htmlString) {
                     result += '{M:' + inner + '}';
                 } else if (node.classList.contains('markup-underline')) {
                     result += '{u:' + node.textContent + '}';
+                } else if (node.classList.contains('markup-bold')) {
+                    result += '{b:' + convertElement(node) + '}';
+                } else if (node.classList.contains('markup-hc')) {
+                    result += '{hc:' + convertElement(node) + '}';
+                } else if (node.classList.contains('markup-nadd')) {
+                    result += '{nadd:' + convertElement(node) + '}';
+                } else if (node.classList.contains('markup-supp')) {
+                    result += '{supp:' + convertElement(node) + '}';
+                } else if (node.classList.contains('markup-marginb')) {
+                    result += '[margin: ' + convertElement(node) + ']';
+                } else if (node.classList.contains('markup-head')) {
+                    result += '{h:' + convertElement(node) + '}';
+                } else if (node.classList.contains('markup-lab')) {
+                    result += '{lab:' + convertElement(node) + '}';
+                } else if (node.classList.contains('markup-al')) {
+                    result += '{al:' + convertElement(node) + '}';
+                } else if (node.classList.contains('markup-cw')) {
+                    result += '{cw:' + convertElement(node) + '}';
+                } else if (node.classList.contains('markup-pos')) {
+                    result += '{pos:' + convertElement(node) + '}';
+                } else if (node.classList.contains('markup-space')) {
+                    result += '{space:' + convertElement(node) + '}';
+                } else if (node.classList.contains('markup-mtop')) {
+                    result += '[top: ' + convertElement(node) + ']';
+                } else if (node.classList.contains('markup-mbottom')) {
+                    result += '[bottom: ' + convertElement(node) + ']';
                 } else if (node.classList.contains('markup-variable')) {
                     result += '{v:' + convertElement(node) + '}';
                 } else if (node.classList.contains('markup-point')) {
@@ -3844,6 +4154,8 @@ function loadWork() {
     
     // Sync column visibility after loading
     syncColumnVisibility();
+    refreshPageBreaks();
+    _metaAfterLoad(folioId, saveData);
     showStatus('✅ Loaded: "' + folioId + '" (last saved: ' + savedDate.toLocaleString() + ')', 'success');
 }
 
@@ -4086,6 +4398,12 @@ function exportMarkdown(dest) {
         
         let output = '# Folio ' + folioId + ' - Corrected Transcription\n\n';
         output += '**Generated:** ' + new Date().toLocaleString() + '\n\n';
+        // v1.27: tier and time
+        const _tierV = document.getElementById('tierSelect').value;
+        if (_tierV) output += '**Tier:** ' + _tierV + '\n\n';
+        const _secV = _timerTotal();
+        if (_secV > 0) output += '**Time:** ' + (_secV / 60).toFixed(1) + ' min (' + _fmtTime(_secV) + ')\n\n';
+        if (_pageNote) output += '**Page note:** ' + _pageNote.replace(/\n+/g, ' / ') + '\n\n';   // v1.28
         output += '---\n\n';
         
         let lineCount = 0;
@@ -4094,23 +4412,13 @@ function exportMarkdown(dest) {
             const lineNum = row.cells[1].textContent;
             const correctedCell = row.cells[3]; // Column 3 is Corrected
             const notes = row.cells[5].textContent.trim(); // Column 5 is Notes
+            if (row.classList.contains('pb-row')) { output += '\n[PAGE BREAK]\n\n'; continue; }   // v1.27
             
             // Get the RAW text content, preserving markup symbols
             let corrected = '';
             
             // If cell has been rendered with markup, extract original from innerHTML
-            if (correctedCell.innerHTML.includes('markup-deleted') || 
-                correctedCell.innerHTML.includes('markup-added') ||
-                correctedCell.innerHTML.includes('markup-unclear') ||
-                correctedCell.innerHTML.includes('markup-datalayer') ||
-                correctedCell.innerHTML.includes('markup-overwrite') ||
-                correctedCell.innerHTML.includes('markup-inline') ||
-                correctedCell.innerHTML.includes('markup-margin') ||
-                correctedCell.innerHTML.includes('markup-underline') ||
-                correctedCell.innerHTML.includes('markup-variable') ||
-                correctedCell.innerHTML.includes('markup-point') ||
-                correctedCell.innerHTML.includes('markup-line') ||
-                correctedCell.innerHTML.includes('markup-figure')) {
+            if (correctedCell.querySelector('[class*="markup-"]')) {   // v1.27: any rendered markup
                 // Has rendered markup - need to convert back
                 
                 function convertMarkupToText(element) {
@@ -4142,6 +4450,32 @@ function exportMarkdown(dest) {
                                 result += '{M:' + inner + '}';
                             } else if (node.classList.contains('markup-underline')) {
                                 result += '{u:' + node.textContent + '}';
+                            } else if (node.classList.contains('markup-bold')) {
+                                result += '{b:' + convertMarkupToText(node) + '}';
+                            } else if (node.classList.contains('markup-hc')) {
+                                result += '{hc:' + convertMarkupToText(node) + '}';
+                            } else if (node.classList.contains('markup-nadd')) {
+                                result += '{nadd:' + convertMarkupToText(node) + '}';
+                            } else if (node.classList.contains('markup-supp')) {
+                                result += '{supp:' + convertMarkupToText(node) + '}';
+                            } else if (node.classList.contains('markup-marginb')) {
+                                result += '[margin: ' + convertMarkupToText(node) + ']';
+                            } else if (node.classList.contains('markup-head')) {
+                                result += '{h:' + convertMarkupToText(node) + '}';
+                            } else if (node.classList.contains('markup-lab')) {
+                                result += '{lab:' + convertMarkupToText(node) + '}';
+                            } else if (node.classList.contains('markup-al')) {
+                                result += '{al:' + convertMarkupToText(node) + '}';
+                            } else if (node.classList.contains('markup-cw')) {
+                                result += '{cw:' + convertMarkupToText(node) + '}';
+                } else if (node.classList.contains('markup-pos')) {
+                    result += '{pos:' + convertMarkupToText(node) + '}';
+                } else if (node.classList.contains('markup-space')) {
+                    result += '{space:' + convertMarkupToText(node) + '}';
+                } else if (node.classList.contains('markup-mtop')) {
+                    result += '[top: ' + convertMarkupToText(node) + ']';
+                } else if (node.classList.contains('markup-mbottom')) {
+                    result += '[bottom: ' + convertMarkupToText(node) + ']';
                             } else if (node.classList.contains('markup-variable')) {
                                 result += '{v:' + convertMarkupToText(node) + '}';
                             } else if (node.classList.contains('markup-point')) {
@@ -4220,14 +4554,14 @@ function exportMarkdown(dest) {
         const today = new Date().toLocaleDateString('en-GB', {day:'2-digit', month:'2-digit', year:'numeric'});
         output += `---\n\n`;
         output += `[REVIEW — ${folioId} — ${today}]\n\n`;
-        output += `GEMINI SUMMARY ASSESSMENT:\n`;
+        output += `AI SUMMARY ASSESSMENT:\n`;
         output += `- Low confidence flags: [correct / false positive / missed — note which lines]\n`;
         output += `- Illegible flags: [correct / false positive / missed — note which lines]\n`;
         output += `- HAND? flags correct: [N/total — list lines]\n`;
         output += `- HAND? false positives: [list lines]\n`;
         output += `- HAND? missed: [list lines]\n\n`;
         output += `TRANSCRIPTION ERRORS:\n`;
-        output += `- [Line N: Gemini "X" → correct "Y" — TYPE: high-frequency substitution / complex revision zone / markup failure / non-Latin normalisation / other]\n\n`;
+        output += `- [Line N: AI "X" → correct "Y" — TYPE: high-frequency substitution / complex revision zone / markup failure / non-Latin normalisation / other]\n\n`;
         output += `HAND ATTRIBUTION DECISIONS:\n`;
         output += `- [Line N, text: attribution (high/medium/low confidence) — evidence]\n\n`;
         output += `SCHOLARLY NOTES:\n`;
@@ -4264,15 +4598,16 @@ function exportHTR(dest, format) {
         let lineCount = 0;
 
         if (format === 'md') {
-            output = '# Folio ' + folioId + ' - HTR Output (Gemini, uncorrected)\n\n';
+            output = '# Folio ' + folioId + ' - HTR Output (AI, uncorrected)\n\n';
             output += '**Generated:** ' + new Date().toLocaleString() + '\n';
-            output += '**Purpose:** Comparison with corrected MD — for Gemini error tracking and hand attribution review\n\n';
+            output += '**Purpose:** Comparison with corrected MD — for AI error tracking and hand attribution review\n\n';
             output += '---\n\n';
 
             for (let i = 0; i < tbody.rows.length; i++) {
                 const row = tbody.rows[i];
                 const lineNum = row.cells[1].textContent.trim();
                 const htrText = row.cells[2].textContent.trim(); // Column 2 is HTR
+                if (row.classList.contains('pb-row')) { output += '[PAGE BREAK]\n\n'; continue; }   // v1.27
 
                 if (htrText && htrText !== 'undefined') {
                     lineCount++;
@@ -4284,17 +4619,19 @@ function exportHTR(dest, format) {
                 output += '---\n\n';
                 output += '[HTR EXPORT — ' + folioId + ' — ' + new Date().toLocaleDateString('en-GB', {day:'2-digit', month:'2-digit', year:'numeric'}) + ']\n';
                 output += 'Lines exported: ' + lineCount + '\n';
-                output += 'Compare with: corrected_' + folioId + '.md\n';
+                var _epfxC = (getActiveProject().shortName || '').replace(/[^a-z0-9]/gi,'_').replace(/_+/g,'_');
+                output += 'Compare with: ' + (_epfxC ? _epfxC + '_' : '') + 'corrected_' + folioId + '.md\n';
             }
         } else {
             // Plain text - simpler, no markdown syntax
-            output = 'Folio ' + folioId + ' - HTR Output (Gemini, uncorrected, plain text)\n';
+            output = 'Folio ' + folioId + ' - HTR Output (AI, uncorrected, plain text)\n';
             output += 'Generated: ' + new Date().toLocaleString() + '\n\n';
 
             for (let i = 0; i < tbody.rows.length; i++) {
                 const row = tbody.rows[i];
                 const lineNum = row.cells[1].textContent.trim();
                 const htrText = row.cells[2].textContent.trim();
+                if (row.classList.contains('pb-row')) { output += '[PAGE BREAK]\n'; continue; }   // v1.27
 
                 if (htrText && htrText !== 'undefined') {
                     lineCount++;
@@ -4304,7 +4641,7 @@ function exportHTR(dest, format) {
         }
 
         if (lineCount === 0) {
-            showStatus('No HTR content to export — paste Gemini output first.', 'error');
+            showStatus('No HTR content to export — paste the AI/HTR output first.', 'error');
             return;
         }
 
@@ -4341,24 +4678,20 @@ function exportTEI(dest) {
         const lineNum = row.cells[1].textContent;
         const correctedCell = row.cells[3]; // Column 3 is Corrected
         const notes = row.cells[5].textContent.trim(); // Column 5 is Notes
+        if (row.classList.contains('pb-row')) { xml += '          <pb/>\n'; continue; }   // v1.27
         
         if (correctedCell.textContent.trim()) {
             // Add note as XML comment before the line
             if (notes) {
-                xml += '          <!-- LINE ' + lineNum + ' NOTE: ' + notes + ' -->\n';
+                xml += '          <!-- LINE ' + lineNum + ' NOTE: ' + notes.replace(/--/g, '- -') + ' -->\n';
             }
             
             xml += '          <lb n="' + lineNum + '"/>';
             
-            // Check for math containers
-            const mathContainers = correctedCell.querySelectorAll('.math-container');
-            if (mathContainers.length > 0) {
-                // Has math - need to process
-                xml += correctedCell.textContent.trim();
-                xml += ' [MATH: LaTeX conversion needed]';
-            } else {
-                xml += correctedCell.textContent.trim();
-            }
+            // v1.27: export the markup exactly as typed (~~del~~, ^add^, {…}, $…$),
+            // XML-escaped — previously the displayed text was exported, which
+            // silently dropped all deletion/addition markup.
+            xml += _xmlEsc(_rawCellMarkup(correctedCell).trim());
             xml += '\n';
         }
     }
@@ -4369,7 +4702,8 @@ function exportTEI(dest) {
     xml += '  </text>\n';
     xml += '</TEI>';
     
-    var _fnameTei = 'tei_' + folioId + '.xml';
+    var _epfxTei = (getActiveProject().shortName || '').replace(/[^a-z0-9]/gi,'_').replace(/_+/g,'_');
+    var _fnameTei = (_epfxTei ? _epfxTei + '_' : '') + 'tei_' + folioId + '.xml';
     if (dest === 'drive') { _uploadTextToDrive(xml, _fnameTei, 'TEI XML saved to Drive'); }
     else { downloadFile(xml, _fnameTei); showStatus('Basic TEI XML exported. Paste into Claude for proper conversion with notes.', 'success'); }
 }
@@ -4492,7 +4826,18 @@ function renderMarkup(cell) {
     cell.dataset.originalMarkup = originalText;
     
     let html = originalText;
-    
+
+    // v1.27: protect LaTeX spans ($...$ and $$...$$) before any markup is
+    // rendered, so a ^ inside math (e.g. $QT^q$) is never paired with a ^ of
+    // the ^addition^ markup. Math is shown as plain text here; rendered LaTeX
+    // stays in the LaTeX pill. A whole formula inside ~~ ~~ or ^ ^ still
+    // renders as deleted/added, since its placeholder sits inside the markup.
+    const _mathSpans = [];
+    html = html.replace(/\$\$[\s\S]*?\$\$|\$[^$\n]+\$|\{sign:[^}]*\}/g, function(m) {
+        _mathSpans.push(m);
+        return '\u0000M' + (_mathSpans.length - 1) + '\u0000';
+    });
+
     // Render ~~deleted~~ as strikethrough
     html = html.replace(/~~([^~]+)~~/g, '<span class="markup-deleted">$1</span>');
     
@@ -4510,6 +4855,11 @@ function renderMarkup(cell) {
     // Render {u:text} as underlined (matches manuscript underlining) - no text label needed,
     // the underline styling itself is the meaning, unlike the abstract DL/M/ov/in categories
     html = html.replace(/\{u:([^}]+)\}/g, '<span class="markup-underline">$1</span>');
+    // v1.27 batch A
+    html = html.replace(/\{b:([^}]+)\}/g, '<span class="markup-bold">$1</span>');
+    html = html.replace(/\{hc:([^}]+)\}/g, '<span class="markup-hc" title="change of hand">$1</span>');
+    html = html.replace(/\{nadd:([^}]+)\}/g, '<span class="markup-nadd" title="addition inside an addition">$1</span>');
+    html = html.replace(/\{supp:([^}]+)\}/g, '<span class="markup-supp" title="supplied (not visible)">$1</span>');
     // Render {ov:text} as orange overwrite flag
     html = html.replace(/\{ov:([^}]+)\}/g, '<span class="markup-overwrite">ov:$1</span>');
     html = html.replace(/\{in:([^}]+)\}/g, '<span class="markup-inline">in:$1</span>');
@@ -4519,7 +4869,43 @@ function renderMarkup(cell) {
     html = html.replace(/\{p:([^}]+)\}/g, '<span class="markup-point">$1</span>');
     html = html.replace(/\{l:([^}]+)\}/g, '<span class="markup-line">$1</span>');
     html = html.replace(/\{f:([^}]+)\}/g, '<span class="markup-figure">$1</span>');
-    
+
+    // v1.28 — layout
+    html = html.replace(/\{pos:([^}]+)\}/g,   '<span class="markup-pos" title="position on the page">$1</span>');
+    html = html.replace(/\{space:([^}]+)\}/g, '<span class="markup-space" title="blank space (approximate)">$1</span>');
+
+    // v1.27 batch B — structural markup, applied last so inner markup is already rendered
+    html = html.replace(/\{cw:([^}]+)\}/g,  '<span class="markup-cw" title="catchword">$1</span>');
+    html = html.replace(/\{lab:([^}]+)\}/g, '<span class="markup-lab" title="label">$1</span>');
+    html = html.replace(/\{h:([^}]+)\}/g,   '<span class="markup-head" title="heading">$1</span>');
+    html = html.replace(/\{al:([^}]+)\}/g,  '<span class="markup-al" title="added line">$1</span>');
+    // [margin: …], [top: …], [bottom: …] — matched with bracket counting,
+    // so [ue]-style expansions and [?…?] inside work
+    [['[margin:', 'markup-marginb', 'margin note'], ['[top:', 'markup-mtop', 'note in the top margin'],
+     ['[bottom:', 'markup-mbottom', 'note in the bottom margin']].forEach(function(spec) {
+        const tag = spec[0];
+        let h = html, out = '', i = 0;
+        while (true) {
+            const k = h.indexOf(tag, i);
+            if (k < 0) { out += h.slice(i); break; }
+            let depth = 0, j = k;
+            for (; j < h.length; j++) {
+                if (h[j] === '[') depth++;
+                else if (h[j] === ']') { depth--; if (depth === 0) break; }
+            }
+            if (j >= h.length) { out += h.slice(i); break; }     // unclosed: leave as typed
+            out += h.slice(i, k) + '<span class="' + spec[1] + '" title="' + spec[2] + '">' +
+                   h.slice(k + tag.length, j).replace(/^ /, '') + '</span>';
+            i = j + 1;
+        }
+        html = out;
+    });
+
+    // Restore protected LaTeX spans as plain (HTML-escaped) text
+    html = html.replace(/\u0000M(\d+)\u0000/g, function(_, i) {
+        return _mathSpans[+i].replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    });
+
     cell.innerHTML = html;
 }
 
@@ -4547,6 +4933,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 option.selected = true;
                 select.insertBefore(option, select.options[2]);
                 
+                _metaAfterLoad(newFolio.trim(), null);
                 showStatus('Folio "' + newFolio.trim() + '" created. You can now paste!', 'success');
                 
                 // Keep focus on cell for immediate pasting
@@ -4725,6 +5112,7 @@ function checkFolioOverwrite(folioId) {
 }
 
 function handleFolioChange() {
+    _metaBeforeSwitch();   // v1.27: pause timer / save tier for the unit being left
     const select = document.getElementById('folioId');
     const value = select.value;
     const currentIndex = select.selectedIndex;
@@ -4783,6 +5171,7 @@ function handleFolioChange() {
             
             // Clear table for new folio
             newPage(true, true); // Skip confirmation and prompt (already done above)
+            _metaAfterLoad(customValue.trim(), null);
             showStatus('Ready for new folio: ' + customValue.trim(), 'success');
             // Update previousFolioIndex to this new selection
             previousFolioIndex = select.selectedIndex;
@@ -4817,16 +5206,10 @@ document.addEventListener('DOMContentLoaded', () => {
     select.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
-            const customValue = prompt('Enter new folio ID:', '');
-            if (customValue && customValue.trim()) {
-                if (!checkFolioOverwrite(customValue.trim())) return;
-                // Add as new option
-                const option = document.createElement('option');
-                option.value = customValue.trim();
-                option.textContent = customValue.trim() + ' (new)';
-                option.selected = true;
-                select.insertBefore(option, select.options[1]);
-            }
+            // v1.27: use the normal new-unit flow, which clears the table.
+            // Previously this added the new unit but kept the previous unit's
+            // text on screen, so a Save copied it into the new unit.
+            newUnitPrompt();
         }
     });
 });
@@ -4875,6 +5258,7 @@ function newPage(skipConfirm = false, skipPrompt = false) {
             option.textContent = newFolio.trim() + ' (new)';
             option.selected = true;
             select.insertBefore(option, select.options[2]);
+            _metaAfterLoad(newFolio.trim(), null);
             
             showStatus('New page ready for folio "' + newFolio.trim() + '" - Paste your HTR!', 'success');
         } else {
@@ -4897,20 +5281,26 @@ function renumberDuplicates() {
     const rows = Array.from(tbody.rows);
     
     // Group row indices by their base integer
+    // v1.27: numbering restarts after each page break, so duplicates are
+    // only looked for within the same page section
     const groups = {};
+    let section = 0;
     rows.forEach((row, idx) => {
+        if (row.classList.contains('pb-row')) { section++; return; }
         const cell = row.cells[1];
         const num = cell ? parseFloat(cell.textContent) : NaN;
         if (isNaN(num)) return;
         const base = Math.floor(num);
-        if (!groups[base]) groups[base] = [];
-        groups[base].push(idx);
+        const key = section + ':' + base;
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(idx);
     });
     
     // For each base that has more than one row, renumber in document order
     let changed = 0;
-    for (const base in groups) {
-        const idxList = groups[base];
+    for (const key in groups) {
+        const idxList = groups[key];
+        const base = key.split(':')[1];
         if (idxList.length > 1) {
             idxList.forEach((rowIdx, k) => {
                 const newNum = Math.round((parseInt(base) + (k + 1) * 0.1) * 10) / 10;
@@ -5282,8 +5672,12 @@ document.addEventListener('paste', function(e) {
         startLineNum = targetLineNum;
     }
 
+    let _nextNum = startLineNum;   // v1.27: numbering restarts at 1 after a [PAGE BREAK]
     lines.forEach((line, index) => {
-        const lineNum = startLineNum + index;
+        const isPB = PB_RE.test(line);
+        if (isPB) line = '[PAGE BREAK]';
+        const lineNum = isPB ? '' : _nextNum++;
+        if (isPB) _nextNum = 1;
         const rowIndex = startRowIndex + index;
 
         let row;
@@ -5299,16 +5693,24 @@ document.addEventListener('paste', function(e) {
         }
 
         if (isHTR) {
-            // Fill HTR column and auto-copy to Corrected (matches existing HTR workflow)
+            // Fill HTR column only (v1.26: no auto-copy — use "fill all" or
+            // double-click to move lines into Corrected Text deliberately)
             row.cells[2].textContent = line;
             row.cells[2].dataset.original = line;
-            row.cells[3].textContent = line;
         } else {
             // Pasting directly into Corrected Text (retrofit workflow) — fill only that column
             row.cells[3].textContent = line;
         }
     });
 
+    // v1.27: keep numbering the empty rows below the pasted block in sequence
+    // (so after a page break they continue 3, 4… rather than the old numbers)
+    for (let r = startRowIndex + lines.length; r < tbody.rows.length; r++) {
+        const row = tbody.rows[r];
+        if (row.cells[2].textContent.trim() || row.cells[3].textContent.trim()) break;
+        row.cells[1].textContent = _nextNum++;
+    }
+    refreshPageBreaks();
     showStatus('Pasted ' + lines.length + ' lines starting at row ' + startLineNum + ' — Remember to Save!', 'success');
 });
 
@@ -5347,6 +5749,7 @@ function showSymbolPicker() {
     const activeElement = document.activeElement;
     if (activeElement && activeElement.classList.contains('editable')) {
         savedCell = activeElement;
+        _rememberCaret(activeElement);
     }
     
     const selection = window.getSelection();
@@ -5374,12 +5777,18 @@ function insertSymbol(symbol) {
         return;
     }
     
+    // Keep the offsets before focus() — the focus handler moves the cursor to the end
+    const off = savedOffsets;
+
     // Restore focus to the cell
     savedCell.focus();
     
     // Restore the saved cursor position if we have one
     const selection = window.getSelection();
-    if (savedRange) {
+    if (off && off.cell === savedCell && savedCell.textContent.length === off.len) {
+        // v1.27: exact position from saved offsets
+        _setCaretOffsets(savedCell, off.start, off.end);
+    } else if (savedRange) {
         try {
             selection.removeAllRanges();
             selection.addRange(savedRange);
@@ -5402,8 +5811,270 @@ function insertSymbol(symbol) {
     if (selection.rangeCount > 0) {
         savedRange = selection.getRangeAt(0).cloneRange();
     }
+    // ...and the offsets, so several symbols in a row go in one after another
+    _rememberCaret(savedCell);
 }
 
+
+// v1.27: raw markup of a Corrected cell, whether it is being edited or rendered
+function _rawCellMarkup(cell) {
+    if (!cell) return '';
+    if (document.activeElement === cell) return cell.textContent || '';
+    if (cell.dataset.originalMarkup !== undefined) return cell.dataset.originalMarkup;
+    return cell.textContent || '';
+}
+function _xmlEsc(t) {
+    return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// v1.27 batch D — per-unit tier and timer
+// Stored inside the unit's own record as `tier` (1–5) and `timeSeconds`.
+// Written straight to the record when they change (no Save needed), and
+// also included by saveWork().
+// ═══════════════════════════════════════════════════════════════════
+let _metaUnit = null;        // unit the tier/timer currently belong to
+let _timerAccum = 0;         // seconds accumulated before the current run
+let _timerStartedAt = null;  // ms timestamp of current run, or null if paused
+let _timerTick = null;
+
+function _timerTotal() {
+    return _timerAccum + (_timerStartedAt ? Math.floor((Date.now() - _timerStartedAt) / 1000) : 0);
+}
+function _fmtTime(sec) {
+    const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s2 = sec % 60;
+    return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(s2).padStart(2, '0');
+}
+function _renderTimer() {
+    const d = document.getElementById('timerDisplay'), b = document.getElementById('timerBtn'),
+          w = document.getElementById('timerWrap');
+    if (d) d.textContent = _fmtTime(_timerTotal());
+    if (b) b.textContent = _timerStartedAt ? '⏸' : '▶';
+    if (w) w.classList.toggle('running', !!_timerStartedAt);
+}
+function _currentUnitOK() {
+    const v = (document.getElementById('folioId') || {}).value;
+    return v && v !== '_new_';
+}
+function _persistUnitMeta() {
+    if (!_metaUnit) return;
+    const key = STORAGE_PREFIX + _metaUnit;
+    const raw = localStorage.getItem(key);
+    if (!raw) return;                       // unit not saved yet — saveWork() will include it
+    try {
+        const obj = JSON.parse(raw);
+        const t = document.getElementById('tierSelect').value;
+        if (t) obj.tier = parseInt(t, 10); else delete obj.tier;
+        const sec = _timerTotal();
+        if (sec > 0) obj.timeSeconds = sec; else delete obj.timeSeconds;
+        if (_pageNote) obj.pageNote = _pageNote; else delete obj.pageNote;   // v1.28
+        localStorage.setItem(key, JSON.stringify(obj));
+    } catch (e) { console.warn('Could not save tier/timer:', e); }
+}
+function toggleTimer() { _timerStartedAt ? pauseTimer() : startTimer(); }
+function startTimer() {
+    if (!_currentUnitOK()) { showStatus('Select or create a unit first', 'error'); return; }
+    if (!_metaUnit) _metaUnit = document.getElementById('folioId').value;
+    _timerStartedAt = Date.now();
+    clearInterval(_timerTick);
+    let n = 0;
+    _timerTick = setInterval(function() {
+        _renderTimer();
+        if (++n % 30 === 0) _persistUnitMeta();   // safety save every 30 s
+    }, 1000);
+    _renderTimer();
+}
+function pauseTimer() {
+    if (_timerStartedAt) { _timerAccum = _timerTotal(); _timerStartedAt = null; }
+    clearInterval(_timerTick); _timerTick = null;
+    _persistUnitMeta();
+    _renderTimer();
+}
+function resetTimer() {
+    if (!confirm('Reset the timer for this unit to 0:00?')) return;
+    clearInterval(_timerTick); _timerTick = null;
+    _timerStartedAt = null; _timerAccum = 0;
+    _persistUnitMeta();
+    _renderTimer();
+}
+function _styleTierSelect() {
+    const sel = document.getElementById('tierSelect');
+    if (!sel) return;
+    sel.className = 'tier-select' + (sel.value ? ' t' + sel.value : '');
+}
+function onTierChange() {
+    if (!_metaUnit && _currentUnitOK()) _metaUnit = document.getElementById('folioId').value;
+    _styleTierSelect();
+    _persistUnitMeta();
+}
+// Called before switching unit or project: pause and save to the unit we are leaving
+function _metaBeforeSwitch() {
+    if (_timerStartedAt) pauseTimer(); else _persistUnitMeta();
+}
+// Called once a unit is loaded (saveData) or created (null)
+function _metaAfterLoad(unitId, saveData) {
+    clearInterval(_timerTick); _timerTick = null;
+    _metaUnit = unitId || null;
+    _timerAccum = (saveData && saveData.timeSeconds) || 0;
+    _timerStartedAt = null;
+    const sel = document.getElementById('tierSelect');
+    if (sel) sel.value = (saveData && saveData.tier) ? String(saveData.tier) : '';
+    _styleTierSelect();
+    _renderTimer();
+    // v1.28: page note belongs to the unit
+    _pageNote = (saveData && saveData.pageNote) || '';
+    _renderPageNoteBtn();
+    // v1.28: refresh the IIIF/local lock button for this unit (it kept the
+    // previous unit's state when a new unit was created)
+    if (unitId && typeof _viewerUpdateLockButton === 'function') {
+        try { _viewerUpdateLockButton(unitId); } catch (e) {}
+    }
+}
+window.addEventListener('beforeunload', function() {
+    if (_timerStartedAt) { _timerAccum = _timerTotal(); _timerStartedAt = null; }
+    _persistUnitMeta();
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// v1.27 batch D — page breaks
+// A row whose text is just [PAGE BREAK] is shown as an unnumbered divider;
+// line numbering restarts at 1 after it (on paste). Stored as plain text,
+// so older Newt versions simply show it as a normal row.
+// ═══════════════════════════════════════════════════════════════════
+const PB_RE = /^\s*(?:\d+[.)]?\s+)?\[PAGE BREAK\]\s*$/i;
+function _isPageBreakRow(row) {
+    if (!row || !row.cells || row.cells.length < 4) return false;
+    const htr = row.cells[2].textContent || '';
+    const cor = row.cells[3].dataset.originalMarkup || row.cells[3].textContent || '';
+    return PB_RE.test(htr) || PB_RE.test(cor);
+}
+function refreshPageBreaks() {
+    const tbody = document.getElementById('tableBody');
+    if (!tbody) return;
+    for (const row of tbody.rows) {
+        const pb = _isPageBreakRow(row);
+        row.classList.toggle('pb-row', pb);
+        if (pb && row.cells[1].textContent !== '') row.cells[1].textContent = '';
+    }
+}
+document.addEventListener('blur', function(e) {
+    if (e.target && e.target.classList &&
+        (e.target.classList.contains('col-htr') || e.target.classList.contains('col-corrected'))) {
+        setTimeout(refreshPageBreaks, 0);
+    }
+}, true);
+
+// ═══════════════════════════════════════════════════════════════════
+// v1.28 — page note, renumber, [ ], layout group
+// ═══════════════════════════════════════════════════════════════════
+let _pageNote = '';
+function _renderPageNoteBtn() {
+    const b = document.getElementById('pageNoteBtn');
+    if (!b) return;
+    b.classList.toggle('has-note', !!_pageNote);
+    b.textContent = _pageNote ? '📝 Page note •' : '📝 Page note';
+}
+function openPageNote() {
+    if (!_currentUnitOK()) { showStatus('Select or create a unit first', 'error'); return; }
+    if (!_metaUnit) _metaUnit = document.getElementById('folioId').value;
+    document.getElementById('pageNoteUnit').textContent = _metaUnit;
+    document.getElementById('pageNoteText').value = _pageNote;
+    document.getElementById('pageNoteModal').style.display = 'flex';
+    setTimeout(function() { document.getElementById('pageNoteText').focus(); }, 30);
+}
+function closePageNote(save) {
+    if (save) {
+        _pageNote = document.getElementById('pageNoteText').value.trim();
+        _persistUnitMeta();
+        _renderPageNoteBtn();
+        showStatus(_pageNote ? 'Page note saved' : 'Page note cleared', 'success');
+    }
+    document.getElementById('pageNoteModal').style.display = 'none';
+}
+
+// Renumber every row 1, 2, 3… from the top, restarting after page breaks
+function renumberAllLines() {
+    const tbody = document.getElementById('tableBody');
+    if (!tbody || !tbody.rows.length) return;
+    if (!confirm('Renumber all lines 1, 2, 3… from the top?\n\nNumbering restarts after each page break, and numbers like 55.1 become whole numbers.')) return;
+    let n = 1, changed = 0;
+    for (const row of tbody.rows) {
+        if (row.classList.contains('pb-row')) { n = 1; continue; }
+        const want = String(n++);
+        if (row.cells[1].textContent !== want) { row.cells[1].textContent = want; changed++; }
+    }
+    showStatus(changed ? 'Renumbered ' + changed + ' lines — Remember to Save!' : 'Line numbers were already in order', 'success');
+}
+
+// [ ] — bracket the selected (supplied) letters of an abbreviation
+function wrapExpansion(event) { if (event) event.preventDefault(); wrapSelectionWith('[', ']', 'Expansion'); }
+
+// Layout group
+function toggleLayoutGroup(show) {
+    ['r2-layout', 'r2-layout-sep', 'r2-layout-label'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.style.display = show ? (id === 'r2-layout' ? 'flex' : 'block') : 'none';
+    });
+    localStorage.setItem(STORAGE_PREFIX + 'toolbar_layout', show ? '1' : '0');
+}
+function _closeLayMenus() { ['posMenu', 'spMenu'].forEach(id => { const m = document.getElementById(id); if (m) m.classList.remove('open'); }); }
+function togglePosMenu() { const m = document.getElementById('posMenu'); const o = m.classList.contains('open'); _closeLayMenus(); if (!o) m.classList.add('open'); }
+let _spTarget = null;   // cell + cursor remembered when the Sp menu opens (typing the number moves focus away)
+function toggleSpMenu() {
+    const m = document.getElementById('spMenu'); const o = m.classList.contains('open'); _closeLayMenus();
+    if (o) return;
+    const cell = _activeCorrectedCell(); if (!cell) return;
+    _spTarget = { cell: cell, off: _getCaretOffsets(cell), len: cell.textContent.length };
+    m.classList.add('open');
+}
+document.addEventListener('mousedown', function(e) {
+    const a = document.getElementById('posWrap'), b = document.getElementById('spWrap');
+    if (a && !a.contains(e.target) && b && !b.contains(e.target)) _closeLayMenus();
+});
+function _activeCorrectedCell() {
+    const sel = window.getSelection();
+    const node = sel && sel.anchorNode;
+    const el = node ? (node.nodeType === Node.TEXT_NODE ? node.parentElement : node) : null;
+    const cell = el && el.closest ? el.closest('.editable') : null;
+    if (!cell) { showStatus('Click in a Corrected Text cell first', 'error'); return null; }
+    if (!cell.classList.contains('col-corrected')) { showStatus('Markup can only be applied in the Corrected Text column', 'error'); return null; }
+    return cell;
+}
+// {pos:…} always goes at the very start of the line (replacing an existing one)
+function insertPos(where) {
+    _closeLayMenus();
+    const cell = _activeCorrectedCell(); if (!cell) return;
+    const txt = cell.textContent;
+    const m = txt.match(/^\{pos:[^}]*\}\s*/);
+    _setCaretOffsets(cell, 0, m ? m[0].length : 0);
+    document.execCommand('insertText', false, '{pos:' + where + '} ');
+    showStatus('Position marked: ' + where + ' (applies from this line until the next {pos:})', 'success');
+}
+function insertSpace(unit) {
+    const q = parseInt(document.getElementById('spQty').value, 10);
+    _closeLayMenus();
+    if (!q || q < 1) { showStatus('Enter a number first', 'error'); return; }
+    const t = _spTarget; _spTarget = null;
+    if (!t || !t.cell) { showStatus('Click in a Corrected Text cell first', 'error'); return; }
+    const cell = t.cell;
+    cell.focus();
+    if (t.off && cell.textContent.length === t.len) _setCaretOffsets(cell, t.off.start, t.off.end);
+    const u = (q === 1) ? unit.replace(/s$/, '') : unit;
+    document.execCommand('insertText', false, '{space:' + q + ' ' + u + '}');
+    showStatus('Blank space marked: about ' + q + ' ' + u, 'success');
+}
+function wrapTopNote(event)    { if (event) event.preventDefault(); _structWrap('[top: ', ']', 'Top-margin note', 'insert'); }
+function wrapBottomNote(event) { if (event) event.preventDefault(); _structWrap('[bottom: ', ']', 'Bottom-margin note', 'insert'); }
+
+// v1.27 batch C — unknown sign: insert {sign:unknown|} and leave the cursor
+// after the |, so a description can be typed (or left empty)
+function insertSignUnknown() {
+    insertSymbol('{sign:unknown|}');
+    const sel = window.getSelection();
+    if (sel && sel.modify) sel.modify('move', 'backward', 'character');
+    if (savedCell) _rememberCaret(savedCell);
+}
 
 // Semantic markup functions
 function wrapVariable(event) {
@@ -5445,9 +6116,47 @@ function wrapDataLayer(event) {
     wrapSelectionWith('{DL:', '}', 'Data layer flag');
 }
 
+// v1.27 batch B — structure buttons
+// Wrap the selection; with nothing selected, either wrap the whole line
+// (H, AL) or insert an empty marker to type into (M).
+function _structWrap(prefix, suffix, type, emptyMode) {
+    const sel = window.getSelection();
+    if (sel && sel.toString().trim()) return wrapSelectionWith(prefix, suffix, type);
+    const cell = document.activeElement;
+    if (!cell || !cell.classList || !cell.classList.contains('editable')) {
+        showStatus('Click in a Corrected Text cell first', 'error'); return;
+    }
+    if (!cell.classList.contains('col-corrected')) {
+        showStatus('Markup can only be applied in the Corrected Text column', 'error'); return;
+    }
+    if (emptyMode === 'whole') {
+        const t = cell.textContent.trim();
+        if (!t) { showStatus('This line is empty', 'error'); return; }
+        const r = document.createRange();
+        r.selectNodeContents(cell);
+        sel.removeAllRanges(); sel.addRange(r);
+        document.execCommand('insertText', false, prefix + t + suffix);
+        showStatus(type + ' marked (whole line)', 'success');
+    } else if (emptyMode === 'insert') {
+        // add separating spaces if the marker would touch neighbouring text
+        const off = _getCaretOffsets(cell), txt = cell.textContent;
+        const before = off && off.start > 0 && !/\s/.test(txt[off.start - 1]) ? ' ' : '';
+        const after  = off && off.end < txt.length && !/\s/.test(txt[off.end]) ? ' ' : '';
+        document.execCommand('insertText', false, before + prefix + suffix + after);
+        const back = suffix.length + after.length;
+        if (sel.modify) for (let i = 0; i < back; i++) sel.modify('move', 'backward', 'character');
+        showStatus(type + ' inserted — type the text', 'success');
+    } else {
+        showStatus('Select text first', 'error');
+    }
+}
+function wrapHeading(event)   { if (event) event.preventDefault(); _structWrap('{h:', '}', 'Heading', 'whole'); }
+function wrapLabel(event)     { if (event) event.preventDefault(); _structWrap('{lab:', '}', 'Label', null); }
+function wrapAddedLine(event) { if (event) event.preventDefault(); _structWrap('{al:', '}', 'Added line', 'whole'); }
+function wrapCatchword(event) { if (event) event.preventDefault(); _structWrap('{cw:', '}', 'Catchword', null); }
 function wrapMargin(event) {
-    event.preventDefault();
-    wrapSelectionWith('{M:', '}', 'Margin addition');
+    if (event) event.preventDefault();
+    _structWrap('[margin: ', ']', 'Margin note', 'insert');
 }
 
 function wrapUnderline(event) {
@@ -5457,7 +6166,52 @@ function wrapUnderline(event) {
 
 function wrapOverwrite(event) {
     if (event) event.preventDefault();
-    wrapSelectionWith('{ov:', '}', 'Overwrite (text written over illegible base)');
+    // v1.27: {ov:new|old} — 'old' (what is underneath) is optional. Insert
+    // {ov:selection|} and leave the cursor after the |, ready to type it.
+    if (wrapSelectionWith('{ov:', '|}', 'Overwrite — type what is underneath after | (or leave empty)') === true) {
+        const sel = window.getSelection();
+        if (sel && sel.modify) sel.modify('move', 'backward', 'character');
+    }
+}
+
+// v1.27 batch A — new wrap buttons
+function wrapBold(event)       { if (event) event.preventDefault(); wrapSelectionWith('{b:', '}', 'Bold in manuscript'); }
+function wrapHandChange(event) { if (event) event.preventDefault(); wrapSelectionWith('{hc:', '}', 'Change of hand'); }
+function wrapNestedAdd(event)  { if (event) event.preventDefault(); wrapSelectionWith('{nadd:', '}', 'Addition inside an addition'); }
+function wrapSupplied(event)   { if (event) event.preventDefault(); wrapSelectionWith('{supp:', '}', 'Supplied (not visible)'); }
+
+// v1.27 batch A — U chooser: mid / low / illegible
+function toggleUnclearMenu() {
+    const m = document.getElementById('uMenu');
+    if (m) m.classList.toggle('open');
+}
+function closeUnclearMenu() {
+    const m = document.getElementById('uMenu');
+    if (m) m.classList.remove('open');
+}
+document.addEventListener('mousedown', function(e) {
+    const w = document.getElementById('uMenuWrap');
+    if (w && !w.contains(e.target)) closeUnclearMenu();
+});
+function applyUnclear(level) {
+    closeUnclearMenu();
+    const sel = window.getSelection();
+    const node = sel && sel.anchorNode;
+    const el = node ? (node.nodeType === Node.TEXT_NODE ? node.parentElement : node) : null;
+    const cell = el ? el.closest('.editable') : null;
+    if (!cell) { showStatus('Click or select in a Corrected Text cell first', 'error'); return; }
+    if (!cell.classList.contains('col-corrected')) {
+        showStatus('Markup can only be applied in the Corrected Text column', 'error'); return;
+    }
+    if (level === 'unclear') {
+        document.execCommand('insertText', false, '[?unclear?]');
+        showStatus('Illegible: [?unclear?] inserted', 'success');
+        return;
+    }
+    const txt = sel.toString().trim();
+    if (!txt) { showStatus('Select the uncertain reading first', 'error'); return; }
+    document.execCommand('insertText', false, '[?' + level + ': ' + txt + '?]');
+    showStatus('Uncertain reading marked (' + level + ')', 'success');
 }
 
 function wrapInline(event) {
@@ -5486,6 +6240,7 @@ function wrapSelectionWith(prefix, suffix, type) {
     }
     document.execCommand('insertText', false, prefix + txt + suffix);
     showStatus(type + ' marked', 'success');
+    return true;
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -5951,6 +6706,16 @@ function toggleGeoGroup(show) {
     localStorage.setItem(STORAGE_PREFIX + 'toolbar_geo', show ? '1' : '0');
 }
 
+// v1.27: Extra markup group (ab · nadd · supp) on the features row
+function toggleExtraGroup(show) {
+    ['r2-extra', 'r2-extra-sep', 'r2-extra-label'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.style.display = show ? (id === 'r2-extra' ? 'flex' : 'block') : 'none';
+    });
+    localStorage.setItem(STORAGE_PREFIX + 'toolbar_extra', show ? '1' : '0');
+}
+
 // (project creation handled by newProjectFlow(), below)
 
 // ═══════════════════════════════════════════════════════════════════
@@ -6092,6 +6857,8 @@ function switchToProject(id) {
     for (var i = 0; i < registry.length; i++) { if (registry[i].id === id) { entry = registry[i]; break; } }
     if (!entry) { showStatus('Project not found: ' + id, 'error'); return; }
 
+    _metaBeforeSwitch();          // v1.27: save timer/tier under the old project first
+    _metaAfterLoad(null, null);
     ACTIVE_PROJECT_ID = id;
     STORAGE_PREFIX    = entry.storagePrefix || ('newt_' + id + '_');
     localStorage.setItem(GLOBAL_ACTIVE_KEY, id);
@@ -6129,7 +6896,8 @@ function newProjectFlow() {
     var sn = (typeof suggestShortName === 'function') ? suggestShortName(name) : name.slice(0, 12);
     var newEntry = { id: id, name: name, shortName: sn, colour: colour,
         storagePrefix: 'newt_' + id + '_',
-        features: { katex: false, geneticEncoding: false, clusterAssignment: false,
+        // v1.27: LaTeX on by default for new projects (switch off in Settings → Features)
+        features: { katex: true, geneticEncoding: false, clusterAssignment: false,
                     propositionMapping: false },
         workflow: { unitType: 'folio', inputMethod: 'htr',
                     colLeft: 'HTR Output', colRight: 'Corrected Text' },
@@ -6988,9 +7756,11 @@ function _doImportOptica(data) {
         });
 
         try {
-            localStorage.setItem(prefix + unit.id, JSON.stringify({
-                folio: unit.id, timestamp: ts, data: rows
-            }));
+            var _rec = { folio: unit.id, timestamp: ts, data: rows };
+            ['tier', 'timeSeconds', 'pageNote', 'cluster', 'clusterCert', 'proposedGrouping'].forEach(function(f) {
+                if (unit[f] !== undefined) _rec[f] = unit[f];   // v1.27
+            });
+            localStorage.setItem(prefix + unit.id, JSON.stringify(_rec));
             stored++;
         } catch(err) {
             console.warn('Could not store unit', unit.id, err);
@@ -7252,6 +8022,14 @@ function applySettingsToUI(cfg) {
 
 function applyFeatureFlags() {
     var features = (getActiveProject().features) || {};
+    // v1.27: timer is shown/hidden rather than greyed out
+    var _pnb = document.getElementById('pageNoteBtn');
+    if (_pnb) _pnb.style.display = features.pageNotes ? '' : 'none';
+    var _tw = document.getElementById('timerWrap');
+    if (_tw) {
+        _tw.style.display = features.timer ? 'inline-flex' : 'none';
+        if (!features.timer && typeof _timerStartedAt !== 'undefined' && _timerStartedAt) pauseTimer();
+    }
     var pillMap = { katex: 'pillLatex', geneticEncoding: 'pillGenetic',
                     clusterAssignment: 'pillClusters' };
     Object.entries(pillMap).forEach(function(pair) {
@@ -7269,6 +8047,13 @@ function toggleFeature(toggleEl) {
     var cfg   = getActiveProject();
     if (!cfg.features) cfg.features = {};
     cfg.features[feat] = nowOn;
+    // v1.27: save the switch straight away, as the Features tab promises
+    // ("Changes take effect immediately") — previously it was only kept if
+    // the Settings panel was closed with Save.
+    if (typeof updateRegistryEntry === 'function') {
+        updateRegistryEntry(ACTIVE_PROJECT_ID, { features: cfg.features });
+    }
+    saveProjectConfig();
     applyFeatureFlags();
     if (feat === 'geneticEncoding' && !nowOn && genColumnVisible) toggleGeneticPill();
 }
@@ -7376,7 +8161,7 @@ function getAllProjectUnits() {
         var key = localStorage.key(i);
         if (!key || !key.startsWith(STORAGE_PREFIX)) continue;
         var suffix = key.replace(STORAGE_PREFIX, '');
-        if (['clusters','project_config','toolbar_geo'].indexOf(suffix) >= 0) continue;
+        if (['clusters','project_config'].indexOf(suffix) >= 0 || suffix.indexOf('toolbar_') === 0) continue;
         try { units.push({ id: suffix, data: JSON.parse(localStorage.getItem(key)) }); } catch(e) {}
     }
     return units.sort(function(a,b) { return a.id.localeCompare(b.id, undefined, {numeric:true}); });
@@ -7493,14 +8278,23 @@ function exportProjectMD() {
     var cfg = getActiveProject();
     // Build as array then join — avoids \n escaping issues
     var lines = ['# ' + (cfg.name || 'Project'), ''];
+    // v1.27: read the stored row format ({line, htr, corrected}); previously
+    // this read non-existent fields and exported headings only
+    var _strip = function(h) { var d = document.createElement('div'); d.innerHTML = h || ''; return d.textContent; };
     units.forEach(function(u) {
         lines.push('## ' + u.id, '');
-        if (u.data && u.data.rows) {
-            u.data.rows.forEach(function(row) {
-                var prefix = row.lineNum ? row.lineNum + '\t' : '';
-                lines.push(prefix + (row.correctedText || row.htrText || ''));
-            });
-        }
+        var d = u.data || {};
+        var meta = [];
+        if (d.tier) meta.push('Tier ' + d.tier);
+        if (d.timeSeconds) meta.push((d.timeSeconds / 60).toFixed(1) + ' min');
+        if (meta.length) lines.push('*' + meta.join(' · ') + '*', '');
+        (Array.isArray(d.data) ? d.data : []).forEach(function(row) {
+            var text = (row.corrected && row.corrected.trim()) ? row.corrected : _strip(row.htr);
+            if (!text || !text.trim()) return;
+            if (PB_RE.test(text)) { lines.push('', '[PAGE BREAK]', ''); return; }
+            var prefix = (row.line !== undefined && row.line !== '') ? row.line + '\t' : '';
+            lines.push(prefix + text);
+        });
         lines.push('', '---', '');
     });
     var md = lines.join('\n');
@@ -7510,7 +8304,7 @@ function exportProjectMD() {
 
 function exportProjectConfig() {
     var cfg = getActiveProject();
-    var out = { _note: 'Newt project config', _version: 'newt_v1_24',
+    var out = { _note: 'Newt project config', _version: NEWT_VERSION,
         id: cfg.id, name: cfg.name, shortName: cfg.shortName, colour: cfg.colour,
         shelfmark: cfg.shelfmark, repository: cfg.repository, language: cfg.language,
         dateRange: cfg.dateRange, iiifUrl: cfg.iiifUrl,
@@ -7521,7 +8315,7 @@ function exportProjectConfig() {
 }
 
 function _buildFullBackupObject() {
-    var backup = { _note: 'Newt full backup', _version: 'newt_v1_24',
+    var backup = { _note: 'Newt full backup', _version: NEWT_VERSION,
         exported: new Date().toISOString(), data: {} };
     for (var i = 0; i < localStorage.length; i++) {
         var k = localStorage.key(i);
@@ -7537,6 +8331,86 @@ function exportFullBackup() {
     _downloadText(JSON.stringify(backup, null, 2),
         'newt_backup_' + new Date().toISOString().slice(0,10) + '.json','application/json');
     showStatus('Full backup exported', 'success');
+}
+
+// ── Restore full backup (v1.27) ───────────────────────────────────
+// Reverses exportFullBackup(): replaces ALL Newt data in this browser
+// (every localStorage key starting "newt") with the contents of a
+// "Newt full backup" JSON file. Non-Newt keys on the same site are left
+// alone. The Drive auto-backup on/off setting is kept as it is, since
+// backups never contain it. A safety backup of the current state is
+// downloaded first, so a restore can itself be undone.
+function restoreFullBackup() {
+    var input = document.createElement('input');
+    input.type = 'file'; input.accept = '.json';
+    input.style.display = 'none';
+    document.body.appendChild(input);
+    input.onchange = function(e) {
+        document.body.removeChild(input);
+        var file = e.target.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+            var backup;
+            try { backup = JSON.parse(ev.target.result); }
+            catch (err) { showStatus('Could not read file: ' + err.message, 'error'); return; }
+            try { _doRestoreFullBackup(backup, file.name); }
+            catch (err) { showStatus('Restore failed: ' + err.message, 'error'); }
+        };
+        reader.readAsText(file);
+    };
+    input.click();
+}
+
+function _doRestoreFullBackup(backup, fileName) {
+    if (!backup || backup._note !== 'Newt full backup' ||
+        !backup.data || typeof backup.data !== 'object') {
+        showStatus('Not a Newt full backup file (use "Export full backup" to make one).', 'error');
+        return;
+    }
+    var keys = Object.keys(backup.data);
+    var newtKeys = keys.filter(function(k) { return k.indexOf('newt') === 0; });
+    if (newtKeys.length === 0) {
+        showStatus('This backup contains no Newt data — nothing restored.', 'error');
+        return;
+    }
+    var when = backup.exported ? backup.exported.replace('T', ' ').slice(0, 16) : 'unknown date';
+    if (!confirm(
+        'Restore full backup?\n\n' +
+        'File: ' + fileName + '\n' +
+        'Made: ' + when + ' (' + (backup._version || 'unknown version') + ')\n' +
+        'Entries: ' + keys.length + '\n\n' +
+        'This REPLACES all Newt data in this browser — every project and folio — ' +
+        'with the contents of the backup. Work saved after the backup was made will be lost.\n\n' +
+        'A safety backup of your current data will be downloaded first.'
+    )) return;
+
+    // 1. Safety backup of the current state
+    var safety = _buildFullBackupObject();
+    _downloadText(JSON.stringify(safety, null, 2),
+        'newt_backup_BEFORE_RESTORE_' + new Date().toISOString().slice(0,19).replace(/:/g, '-') + '.json',
+        'application/json');
+
+    // 2. Remove current Newt keys (keep the Drive auto-backup switch)
+    var toRemove = [];
+    for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k.indexOf('newt') === 0 && k !== 'newt_drive_autobackup') toRemove.push(k);
+    }
+    toRemove.forEach(function(k) { localStorage.removeItem(k); });
+
+    // 3. Write the backup's keys exactly as stored
+    var written = 0;
+    keys.forEach(function(k) {
+        if (k === 'newt_drive_autobackup') return;
+        var v = backup.data[k];
+        localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
+        written++;
+    });
+
+    alert('Restored ' + written + ' entries from ' + fileName + '.\n\n' +
+          'Newt will now reload to show the restored data.');
+    location.reload();
 }
 
 // ── Google Drive backup (Settings > Import & Export) ──────────────
@@ -7872,7 +8746,12 @@ function exportSingleProjectJSON() {
 
         // Stored shape uses `data` for the row array; import format uses `rows`.
         var rows = Array.isArray(raw.data) ? raw.data : [];
-        units.push({ id: unitId, rows: rows });
+        // v1.27: carry per-unit tier, time and cluster info as well
+        var _u = { id: unitId, rows: rows };
+        ['tier', 'timeSeconds', 'pageNote', 'cluster', 'clusterCert', 'proposedGrouping'].forEach(function(f) {
+            if (raw[f] !== undefined) _u[f] = raw[f];
+        });
+        units.push(_u);
     }
 
     if (units.length === 0) {
@@ -7926,6 +8805,16 @@ window.addEventListener('DOMContentLoaded', () => {
         toggleGeoGroup(true);
         const _chk = document.getElementById('chkGeo');
         if (_chk) _chk.checked = true;
+    }
+    if (localStorage.getItem(STORAGE_PREFIX + 'toolbar_layout') === '1') {
+        toggleLayoutGroup(true);
+        const _chkL = document.getElementById('chkLayout');
+        if (_chkL) _chkL.checked = true;
+    }
+    if (localStorage.getItem(STORAGE_PREFIX + 'toolbar_extra') === '1') {
+        toggleExtraGroup(true);
+        const _chkX = document.getElementById('chkExtra');
+        if (_chkX) _chkX.checked = true;
     }
 });
 </script>
@@ -8740,6 +9629,14 @@ function exportClusterJSON() {
         <div><div class="s-toggle-name">Clusters</div><div class="s-toggle-desc">Assign units to named clusters or sections</div></div>
         <div class="s-toggle" onclick="toggleFeature(this)"></div>
       </div>
+      <div class="s-toggle-row" data-feature="pageNotes">
+        <div><div class="s-toggle-name">Page notes</div><div class="s-toggle-desc">A comment on the whole page, via a 📝 button in the top row</div></div>
+        <div class="s-toggle" onclick="toggleFeature(this)"></div>
+      </div>
+      <div class="s-toggle-row" data-feature="timer">
+        <div><div class="s-toggle-name">Timer</div><div class="s-toggle-desc">Time spent on each unit, with start / pause in the top row</div></div>
+        <div class="s-toggle" onclick="toggleFeature(this)"></div>
+      </div>
       <div class="s-toggle-row" data-feature="propositionMapping">
         <div><div class="s-toggle-name">Proposition Mapping</div><div class="s-toggle-desc">Link units to propositions in a reference structure</div></div>
         <div class="s-toggle" onclick="toggleFeature(this)"></div>
@@ -8776,6 +9673,9 @@ function exportClusterJSON() {
       </div>
       <div class="s-exp-block" onclick="exportFullBackup()">
         <div><div class="s-exp-name">Export full backup (JSON)</div><div class="s-exp-desc">Config + all transcription data</div></div><span>&#x2193;</span>
+      </div>
+      <div class="s-exp-block" onclick="restoreFullBackup()" style="border-color:#C0392B">
+        <div><div class="s-exp-name" style="color:#C0392B">Restore full backup&#x2026;</div><div class="s-exp-desc">Replaces ALL Newt data in this browser with a full backup file. Your current data is downloaded first as a safety copy.</div></div><span style="color:#C0392B">&#x2191;</span>
       </div>
       <div class="s-divider"></div>
       <div style="border: 2px solid #1D9E75; border-radius: 6px; padding: 12px; margin-bottom: 6px;">
