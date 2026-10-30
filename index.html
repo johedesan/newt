@@ -2498,7 +2498,7 @@
 // before populateFolioDropdown() and initializeTable() run at parse time.
 // Default value; overwritten at runtime by the project selector.
 var STORAGE_PREFIX = 'newt_ms_add_3965_';
-var NEWT_VERSION = 'newt_v1_28';   // v1.27: stamped into config/backup exports
+var NEWT_VERSION = 'newt_v1_28';   // v1.28: stamped into config/backup exports
 
 // Global state
 let cvColumnVisible = false; // Default to hidden
@@ -7038,6 +7038,7 @@ var _viewerRotation  = 0;
 
 var _viewerCanvasMap  = {};
 var _viewerCanvasList = [];
+var _viewerCanvasSvc  = [];   // v1.28: image service URL per canvas, by POSITION (labels are not unique, e.g. Trinity)
 var _viewerCanvasIdx  = 0;
 
 var _viewerLocalList  = [];
@@ -7148,7 +7149,7 @@ function _viewerShowSrc(src, label) {
 // ── IIIF mode ─────────────────────────────────────────────────────
 async function viewerFetchIIIF() {
     if (_viewerMode === 'iiif') {
-        _viewerMode = null; _viewerCanvasMap = {}; _viewerCanvasList = []; _viewerCanvasIdx = 0;
+        _viewerMode = null; _viewerCanvasMap = {}; _viewerCanvasList = []; _viewerCanvasSvc = []; _viewerCanvasIdx = 0;
         _viewerUpdateModeButtons(); _viewerShowPlaceholder('IIIF cleared');
         return;
     }
@@ -7186,7 +7187,7 @@ function _viewerShowIIIFCanvas() {
     if (!_viewerCanvasList.length) return;
     _viewerCanvasIdx = Math.max(0, Math.min(_viewerCanvasList.length - 1, _viewerCanvasIdx));
     var label = _viewerCanvasList[_viewerCanvasIdx];
-    var svcUrl = _viewerCanvasMap[label];
+    var svcUrl = _viewerCanvasSvc[_viewerCanvasIdx];   // v1.28: by position, not by label
     if (!svcUrl) return;
     var src = svcUrl + '/full/full/0/default.jpg';
     var lbl = label + '  (' + (_viewerCanvasIdx + 1) + ' / ' + _viewerCanvasList.length + ')';
@@ -7195,14 +7196,15 @@ function _viewerShowIIIFCanvas() {
 }
 
 function buildCanvasMap(manifest) {
-    _viewerCanvasMap = {}; _viewerCanvasList = [];
+    _viewerCanvasMap = {}; _viewerCanvasList = []; _viewerCanvasSvc = [];
     try {
         var canvases = (manifest.sequences && manifest.sequences[0] && manifest.sequences[0].canvases) || manifest.items || [];
-        canvases.forEach(function(canvas) {
+        canvases.forEach(function(canvas, _ci) {
             var label = canvas.label || '';
             if (typeof label === 'object') { label = (label.en && (Array.isArray(label.en) ? label.en[0] : label.en)) || Object.values(label)[0] || ''; }
             if (Array.isArray(label)) label = label[0] || '';
             label = (label + '').trim();
+            if (!label) label = '[' + (_ci + 1) + ']';   // v1.28: unlabelled canvas keeps its place (was skipped, shifting later canvas numbers)
             var serviceUrl = '';
             try {
                 if (canvas.images && canvas.images[0]) {
@@ -7214,7 +7216,7 @@ function buildCanvasMap(manifest) {
                     serviceUrl = (svc && (svc['@id'] || svc.id)) || body.id || '';
                 }
             } catch(e2) {}
-            if (label && serviceUrl) { _viewerCanvasMap[label] = serviceUrl; _viewerCanvasList.push(label); }
+            if (label && serviceUrl) { _viewerCanvasMap[label] = serviceUrl; _viewerCanvasList.push(label); _viewerCanvasSvc.push(serviceUrl); }
         });
     } catch(e) { console.warn('Viewer: IIIF parse error:', e); }
     return _viewerCanvasList.length;
